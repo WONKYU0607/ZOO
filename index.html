@@ -154,6 +154,41 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #entry .cfgbtn{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:16px;z-index:20;
   backdrop-filter:blur(4px)}
 
+/* ---------- 방 설정 창 ---------- */
+.opts{position:absolute;inset:0;z-index:55;visibility:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end}
+.opts.on{visibility:visible}
+.opts__v{position:absolute;inset:0;background:rgba(4,7,5,.78);opacity:0;transition:opacity .24s ease}
+.opts.on .opts__v{opacity:1}
+.opts__p{position:relative;background:linear-gradient(180deg,#1A130C,#0E0A06);
+  border-top:1px solid var(--gold,#B08A34);border-radius:12px 12px 0 0;
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.3,1)}
+.opts.on .opts__p{transform:none}
+.opts__h{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px 12px;border-bottom:1px solid #2E2417;
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;color:#E9D5AC}
+.opts__x{font-size:21px;line-height:1;color:#B8A47E;background:none;border:none;cursor:pointer;padding:0 4px}
+.opts__b{padding:14px 18px 4px;max-height:56vh;overflow-y:auto}
+.opts__f{padding:10px 18px calc(env(safe-area-inset-bottom) + 16px)}
+.opts__go{width:100%;padding:14px;border-radius:2px;cursor:pointer;
+  background:linear-gradient(180deg,#7A2226,#4A1418);border:1px solid var(--gold,#B08A34);
+  color:#E9D5AC;font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.06em}
+.mk__row{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;border:1px solid #33261A;border-radius:3px;margin-bottom:7px;
+  background:rgba(0,0,0,.3)}
+.mk__t{font-size:13px;color:#E9D5AC}
+.mk__d{font-size:10.5px;color:#9C8C6E;margin-top:2px;line-height:1.45}
+.mk__st{display:flex;align-items:center;border:1px solid #7A5E24;border-radius:2px;overflow:hidden;flex:none}
+.mk__st button{width:30px;height:28px;font-size:17px;line-height:1;color:#B8A47E;background:none;border:none;cursor:pointer}
+.mk__st button:disabled{opacity:.32}
+.mk__st span{min-width:36px;text-align:center;font-family:"Noto Serif KR",serif;font-weight:900;font-size:14px;color:#E9D5AC}
+.mk__sw{width:42px;height:24px;border-radius:12px;border:1px solid #7A5E24;
+  background:rgba(0,0,0,.4);position:relative;flex:none;cursor:pointer}
+.mk__sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:#7B6C50;transition:transform .18s ease,background .18s ease}
+.mk__sw[aria-checked="true"]{background:rgba(176,138,52,.3);border-color:#B08A34}
+.mk__sw[aria-checked="true"]::after{transform:translateX(18px);background:#E3C67C}
+
 /* ---------- 설정 창 ---------- */
 .cfg{position:absolute;inset:0;z-index:60;visibility:hidden;
   display:flex;flex-direction:column;justify-content:flex-end}
@@ -338,6 +373,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   background:linear-gradient(180deg,rgba(8,5,2,.3),rgba(8,5,2,.52) 42%,rgba(6,4,2,.78))}
 
 
+
 #draw{
   --card-ink:#3B2A12; --card-ink-2:#5A431C;
   --gold:#B08A34; --gold-hi:#E3C67C; --gold-dim:#7A5E24;
@@ -477,15 +513,16 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   content:"";position:absolute;inset:0;border-radius:50%;
   background:repeating-linear-gradient(51deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
 }
-#room .felt__c{z-index:2;
+#room .felt__c{z-index:3;
   position:absolute;left:49%;transform:translate(-50%,-50%);
   text-align:center;width:min(160px,46%);
 }
 #room .felt__n{font-family:"Gowun Batang",serif;font-weight:700;font-size:19px;color:#D9E6DC}
 #room .felt__s{font-size:11.5px;color:#8FA898;margin-top:6px;line-height:1.6}
 
-#room .seat{
-  position:absolute;width:60px;margin-left:-30px;margin-top:-34px;
+#room .seat{--av:46px;--fs:11px;pointer-events:none;z-index:3;
+  position:absolute;width:calc(var(--av,46px) + 30px);
+  margin-top:0;
   display:flex;flex-direction:column;align-items:center;gap:5px;
   text-align:center;
 }
@@ -510,7 +547,13 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .seat--me .seat__av{border-color:#E3C67C;box-shadow:0 0 0 3px rgba(227,198,124,.22),0 3px 10px rgba(0,0,0,.6)}
 
 #room /* ---------- controls ---------- */
-.opt{position:relative;z-index:3;
+.sum{position:relative;z-index:3;width:100%;display:block;text-align:center;
+  font-size:11.5px;color:#B0A283;cursor:pointer;
+  margin:0 0 8px;padding:9px 12px;border:1px solid var(--gold-dim);border-radius:3px;
+  background:rgba(0,0,0,.5);text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#room .sum:disabled{cursor:default;opacity:.7;border-color:#33261A}
+#room .sum b{color:var(--gold-hi);font-weight:400}
+#room .opt{position:relative;z-index:3;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:8px 11px;border:1px solid #33261A;border-radius:3px;margin-bottom:6px;
   background:rgba(0,0,0,.24);
@@ -547,8 +590,8 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .dots::after{content:"";animation:dots 1.4s steps(4,end) infinite}
 @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
-#room .lowfade{position:absolute;left:-20px;right:-20px;bottom:-20px;height:62%;z-index:2;pointer-events:none;
-  background:linear-gradient(180deg,transparent,rgba(5,9,6,.8) 22%,rgba(4,7,5,.97) 44%)}
+#room .lowfade{position:absolute;left:-20px;right:-20px;bottom:-20px;height:34%;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(5,9,6,.55) 40%,rgba(4,7,5,.9))}
 #room .veil{position:absolute;inset:0;z-index:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(5,9,6,.86) 0%,rgba(6,10,7,.34) 22%,rgba(6,10,7,.28) 52%,rgba(5,8,6,.88) 72%,rgba(4,7,5,.96) 100%)}
 
@@ -764,9 +807,9 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 .seat{--av:44px;--fs:10.5px;position:absolute;width:calc(var(--av,44px) + 32px);
   display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6;
-  transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
-#table .seat{transform:translate(-50%,-50%)}
-#table .seat__av{width:var(--av,44px);height:var(--av,44px);border-radius:50%;object-fit:cover;
+  z-index:6}
+#table .seat{transform:translate(-50%,-50%)}   #table /* JS가 아바타 기준으로 다시 잡는다 */
+.seat__av{width:var(--av,44px);height:var(--av,44px);border-radius:50%;object-fit:cover;
   border:2px solid rgba(198,154,60,.6);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6)}
 #table .seat--turn .seat__av{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(227,198,124,.3),0 3px 9px rgba(0,0,0,.6)}
 #table .seat--pass .seat__av, #table .seat--pass .seat__n{opacity:.36}
@@ -982,7 +1025,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
     <div id="seats"></div>
   </div>
 
-  <div id="controls"></div>
+  <button class="sum" id="sum" data-optopen></button>
   <div id="action"></div>
 </main>
 
@@ -1068,6 +1111,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   transition:opacity .2s ease;z-index:50"></div>
 
 </section>
+<div class="opts" id="opts" role="dialog" aria-modal="true"><div class="opts__v" data-optclose></div><div class="opts__p"><div class="opts__h"><span id="optT"></span><button class="opts__x" data-optclose aria-label="close">×</button></div><div class="opts__b" id="optBody"></div><div class="opts__f"><button class="opts__go" id="optGo"></button></div></div></div>
 <div class="cfg" id="cfg" role="dialog" aria-modal="true"><div class="cfg__v" data-cfgclose></div><div class="cfg__p"><div class="cfg__h"><span id="cfgT"></span><button class="cfg__x" data-cfgclose aria-label="close">×</button></div><div class="cfg__b"><div class="cfg__l" id="cfgLangL"></div><div class="cfg__row"><button data-l="ko">한국어</button><button data-l="en">English</button></div><p class="cfg__n" id="cfgNote"></p></div></div></div>
 </div>
 
@@ -1172,6 +1216,11 @@ const T = {
     lbNew:"친구와 하기", btNew:"방 만들기",
     hNew:"방을 만들면 4자리 번호가 나옵니다. 친구에게 번호를 알려 주세요. 4명부터 8명까지 함께할 수 있습니다.",
     lbJoin:"번호로 들어가기", btJoin:"참가",
+    mkTitle:"방 만들기", mkGo:"방 만들기",
+    mkCap:["방 인원","4명 \u2013 8명"],
+    mkRnd:["플레이 판 수 설정","최소 3판부터 시작"],
+    mkTax:["세금과 혁명","등수에 따라 카드를 교환하고, 조커 두 장으로 순위를 뒤집는 규칙입니다."],
+    mkCut:["2번 컷","2번 카드를 내면 바닥을 비우고 다시 선을 잡습니다."],
     rules:"규칙 보기", shTitle:"규칙",
     shLead:"손에 든 카드를 <b>먼저 다 털어내면</b> 이깁니다. 핵심은 하나입니다 — <b>숫자가 낮을수록 높은 계급</b>이고, 해당 숫자와 덱에 들어있는 카드의 장 수가 일치합니다. 예) 1 사자 = 1장, 12 생쥐 = 12장.",
     names:["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"],
@@ -1192,6 +1241,11 @@ const T = {
     lbNew:"PLAY WITH FRIENDS", btNew:"Create room",
     hNew:"You'll get a 4-digit number. Share it with your friends. 4 to 8 players.",
     lbJoin:"JOIN BY NUMBER", btJoin:"Join",
+    mkTitle:"Create a room", mkGo:"Create room",
+    mkCap:["Table size","4 \u2013 8 players"],
+    mkRnd:["Number of rounds","Three at least"],
+    mkTax:["Tax and revolution","Cards change hands by standing, and two jokers overturn it."],
+    mkCut:["Two-cut","Playing a 2 clears the pile and you lead again."],
     rules:"How to play", shTitle:"How to play",
     shLead:"<b>Empty your hand first</b> to win. One idea drives everything — <b>the lower the number, the higher the rank</b>, and that number is also how many of the card sit in the deck. 1 Lion means one card, 12 Mouse means twelve.",
     names:["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"],
@@ -1271,6 +1325,7 @@ document.getElementById("code").addEventListener("input", e => {
 
 window.addEventListener("langchange", () => { lang = window.__lang; render(); });
 
+
 })();
 (function(){
 const __r = window.document.getElementById("draw");
@@ -1323,10 +1378,30 @@ let pool = [];                     // 바닥에 깔린 카드
 let waiting = [];                  // 아직 안 뽑은 자리 (순서대로)
 let phase = "pick";                // pick | tie | done
 
-const RING = {cx: 49, cy: 44, rx: 36, ry: 16};
+
+/* 배경 그림 속 초록 타원의 실제 화면 좌표(cover 기준) */
+const OV = {iw: 853, ih: 1844, cx: 0.4994, cy: 0.4415, rx: 0.4250, ry: 0.1720};
+function ovalRect(W, H){
+  const s = Math.max(W / OV.iw, H / OV.ih);
+  const dw = OV.iw * s, dh = OV.ih * s;
+  const ox = (W - dw) / 2, oy = (H - dh) / 2;
+  return {cx: (ox + OV.cx * dw) / W * 100, cy: (oy + OV.cy * dh) / H * 100,
+          rx: (OV.rx * dw) / W * 100,      ry: (OV.ry * dh) / H * 100};
+}
+let RING = {cx: 49, cy: 44, rx: 33, ry: 13.5};
+function syncRing(){
+  const sec = window.document.getElementById("draw");
+  const b = sec ? sec.getBoundingClientRect() : {width: 390, height: 844};
+  RING = ovalRect(b.width, b.height);
+  const d = el("deck");
+  if (d){ d.style.left = RING.cx + "%"; d.style.top = RING.cy + "%"; }
+}
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
-  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
+  const s = Math.sin(a);
+  /* 이름표가 아래로 달려서, 아래쪽 자리는 그만큼 더 바깥으로 빼야 위와 대칭이 된다 */
+  const bias = s > 0.25 ? 3.4 * s : 0;
+  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + s * RING.ry + bias};
 }
 function cardFace(c){
   const n = isJ(c) ? 13 : c;
@@ -1420,7 +1495,28 @@ function settle(){
   draw();
 }
 
+
+
+/* 자리 상자가 아니라 '아바타의 중심'이 타원 위에 오도록 보정하고,
+   화면이나 아래 UI를 넘으면 그만큼 안으로 당긴다 */
+function anchorSeats(box, limitBottom){
+  const root = window.document.documentElement;
+  const W = (window.document.getElementById("stage") || root).getBoundingClientRect();
+  box.querySelectorAll(".seat").forEach(s => {
+    const av = s.querySelector(".seat__av");
+    if (!av) return;
+    const dy = av.offsetTop + av.offsetHeight / 2;
+    s.style.transform = "translate(-50%," + (-dy) + "px)";
+    const r = s.getBoundingClientRect();
+    let ox = 0, oy = 0;
+    if (r.left < W.left + 3) ox = (W.left + 3) - r.left;
+    else if (r.right > W.right - 3) ox = (W.right - 3) - r.right;
+    if (limitBottom && r.bottom > limitBottom) oy = limitBottom - r.bottom;
+    if (ox || oy) s.style.transform = "translate(calc(-50% + " + ox + "px)," + (-dy + oy) + "px)";
+  });
+}
 function renderSeats(){
+  syncRing();
   const box = el("seats"); box.innerHTML = "";
   const order = phase === "done" ? ranking().map(x => x.i) : [];
   for (let i = 0; i < N; i++){
@@ -1443,6 +1539,8 @@ function renderSeats(){
       (dv === "" ? "" : '<span class="seat__d">' + dv + '</span>');
     box.appendChild(d);
   }
+  const md = el("mid");
+  anchorSeats(box, md ? md.getBoundingClientRect().top - 4 : 0);
 }
 
 function draw(){
@@ -1464,6 +1562,8 @@ function draw(){
   const g = el("go");
   g.textContent = phase === "done" ? t.go : t.picking;
   g.disabled = phase !== "done";
+  const md = el("mid");
+  anchorSeats(el("seats"), md ? md.getBoundingClientRect().top - 4 : 0);
 }
 
 function boot(){
@@ -1523,6 +1623,7 @@ const L = {
        clrT:"2번 컷",
        clrD:"2번 카드를 내면 바닥을 비우고 다시 선을 잡습니다.",
        on:"켜져 있습니다.", off:"꺼져 있습니다.",
+       sumP:"명", sumR:"판", sumT:"세금", sumC:"2번 컷", on2:"켬", off2:"끔", edit:"\u203A 변경",
        start:"시작하기", needFour:"4명이 모여야 시작합니다",
        wait:"방장이 시작하기를 기다리는 중입니다" },
   en:{ title:"Waiting room", roomL:"ROOM NUMBER", copy:"Copy", host:"Host", guest:"Guest",
@@ -1538,6 +1639,7 @@ const L = {
        clrT:"Two-cut",
        clrD:"Playing a 2 clears the pile and you lead again.",
        on:"On.", off:"Off.",
+       sumP:" players", sumR:" rounds", sumT:"Tax", sumC:"Two-cut", on2:"on", off2:"off", edit:"\u203A Change",
        start:"Start", needFour:"Four players are needed",
        wait:"Waiting for the host to start" }
 };
@@ -1550,27 +1652,62 @@ let rounds = 5;       // 몇 판까지
 let taxOn = true;     // 세금·혁명 사용
 let role = "host";
 
-/* 남은 공간에 맞춰 배경 타원과 자리를 같이 옮긴다 */
+
+/* 배경 그림 속 초록 타원의 실제 화면 좌표(cover 기준) */
+const OV = {iw: 853, ih: 1844, cx: 0.4994, cy: 0.4415, rx: 0.4250, ry: 0.1720};
+function ovalRect(W, H){
+  const s = Math.max(W / OV.iw, H / OV.ih);
+  const dw = OV.iw * s, dh = OV.ih * s;
+  const ox = (W - dw) / 2, oy = (H - dh) / 2;
+  return {cx: (ox + OV.cx * dw) / W * 100, cy: (oy + OV.cy * dh) / H * 100,
+          rx: (OV.rx * dw) / W * 100,      ry: (OV.ry * dh) / H * 100};
+}
+/* 타원 아래끝이 설정 칸 바로 위에 오도록 배경을 올리고, 자리를 그 테두리에 앉힌다 */
 function ringBox(){
-  const scr = document.querySelector(".screen").getBoundingClientRect();
-  const tw  = document.querySelector(".tablewrap").getBoundingClientRect();
-  const H = scr.height || 1;
-  const cyPx = (tw.top + tw.height / 2) - scr.top;
-  const ryPx = Math.max(44, Math.min(H * 0.135, tw.height / 2 - 52));
   const sec = window.document.getElementById("room");
-  if (sec) sec.style.backgroundPositionY = Math.round(cyPx - H * 0.44) + "px";
-  return {cx: 49, cy: cyPx / H * 100, rx: 35, ry: ryPx / H * 100};
+  const b = sec ? sec.getBoundingClientRect() : {width: 390, height: 844, top: 0};
+  const W = b.width, H = b.height;
+  const o = ovalRect(W, H);
+  const ctrl = document.getElementById("sum");
+  const limit = ctrl ? (ctrl.getBoundingClientRect().top - b.top - 22) : H * 0.72;
+  const ryPx = o.ry / 100 * H;
+  const wantCy = Math.min(o.cy / 100 * H, limit - ryPx);
+  const shift = Math.round(wantCy - o.cy / 100 * H);
+  if (sec) sec.style.backgroundPositionY = shift + "px";
+  return {cx: o.cx, cy: (wantCy / H) * 100, rx: o.rx, ry: o.ry};
 }
 let RB = {cx: 49, cy: 34, rx: 35, ry: 11.5};
 
+
+
+/* 자리 상자가 아니라 '아바타의 중심'이 타원 위에 오도록 보정하고,
+   화면이나 아래 UI를 넘으면 그만큼 안으로 당긴다 */
+function anchorSeats(box, limitBottom){
+  const root = window.document.documentElement;
+  const W = (window.document.getElementById("stage") || root).getBoundingClientRect();
+  box.querySelectorAll(".seat").forEach(s => {
+    const av = s.querySelector(".seat__av");
+    if (!av) return;
+    const dy = av.offsetTop + av.offsetHeight / 2;
+    s.style.transform = "translate(-50%," + (-dy) + "px)";
+    const r = s.getBoundingClientRect();
+    let ox = 0, oy = 0;
+    if (r.left < W.left + 3) ox = (W.left + 3) - r.left;
+    else if (r.right > W.right - 3) ox = (W.right - 3) - r.right;
+    if (limitBottom && r.bottom > limitBottom) oy = limitBottom - r.bottom;
+    if (ox || oy) s.style.transform = "translate(calc(-50% + " + ox + "px)," + (-dy + oy) + "px)";
+  });
+}
 function renderSeats(){
   RB = ringBox();
   const box = document.getElementById("seats");
   box.innerHTML = "";
   for (let i = 0; i < cap; i++){
     const a = (Math.PI / 2) + (i * 2 * Math.PI / cap);   // 아래에서 시계 방향
+    const sy = Math.sin(a);
+    const bias = sy > 0.25 ? 3.4 * sy : 0;   /* 아래쪽은 이름표만큼 더 바깥으로 */
     const left = RB.cx + Math.cos(a) * -RB.rx;
-    const top  = RB.cy + Math.sin(a) * RB.ry;
+    const top  = RB.cy + sy * RB.ry + bias;
     const filled = i < joined;
     const el = document.createElement("div");
     el.className = "seat" + (filled ? "" : " seat--empty") + (i === 0 ? " seat--me" : "");
@@ -1586,6 +1723,8 @@ function renderSeats(){
       : '<div class="seat__av">+</div><span class="seat__n">' + L[lang].empty + '</span>';
     box.appendChild(el);
   }
+  const sm = document.getElementById("sum");
+  anchorSeats(box, sm ? sm.getBoundingClientRect().top - 6 : 0);
   const t = L[lang];
   document.getElementById("bt").textContent = t.title;
   document.getElementById("rl").textContent = t.roomL;
@@ -1599,71 +1738,38 @@ function renderSeats(){
     joined < 4 ? t.needMore : joined < cap ? t.canStart : t.full;
 }
 
+function syncOpts(){
+  const o = window.__opts || {};
+  cap = o.cap || cap; rounds = o.rounds || rounds;
+  taxOn = o.tax !== false; clear2 = !!o.clear2;
+  if (joined > cap) joined = cap;
+}
 function renderControls(){
-  const c = document.getElementById("controls");
-  const a = document.getElementById("action");
   const t = L[lang];
+  const sm = document.getElementById("sum");
+  sm.innerHTML =
+    '<b>' + cap + '</b>' + t.sumP + ' \u00B7 <b>' + rounds + '</b>' + t.sumR +
+    ' \u00B7 ' + t.sumT + ' ' + (taxOn ? t.on2 : t.off2) +
+    ' \u00B7 ' + t.sumC + ' ' + (clear2 ? t.on2 : t.off2) +
+    (role === "host" ? '  <span style="color:#E3C67C">' + t.edit + '</span>' : '');
+  sm.disabled = role !== "host";
+  const a = document.getElementById("action");
   if (role === "host"){
-    c.innerHTML =
-      '<div class="opt">' +
-        '<div><div class="opt__t">' + t.capT + '</div>' +
-        '<div class="opt__d">' + t.capD + '</div></div>' +
-        '<div class="stepper">' +
-          '<button id="minus" ' + (cap <= 4 ? "disabled" : "") + ' aria-label="인원 줄이기">−</button>' +
-          '<span>' + cap + '</span>' +
-          '<button id="plus" ' + (cap >= 8 ? "disabled" : "") + ' aria-label="인원 늘리기">+</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="opt">' +
-        '<div><div class="opt__t">' + t.rndT + '</div>' +
-        '<div class="opt__d">' + t.rndD + '</div></div>' +
-        '<div class="stepper">' +
-          '<button id="rminus" ' + (rounds <= 3 ? "disabled" : "") + ' aria-label="판 수 줄이기">−</button>' +
-          '<span>' + t.rndU(rounds) + '</span>' +
-          '<button id="rplus" aria-label="판 수 늘리기">+</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="opt">' +
-        '<div><div class="opt__t">' + t.taxT + '</div>' +
-        '<div class="opt__d">' + t.taxD + '</div></div>' +
-        '<button class="sw" id="swTax" role="switch" aria-checked="' + taxOn + '" aria-label="' + t.taxT + '"></button>' +
-      '</div>' +
-      '<div class="opt">' +
-        '<div><div class="opt__t">' + t.clrT + '</div>' +
-        '<div class="opt__d">' + t.clrD + '</div></div>' +
-        '<button class="sw" id="sw" role="switch" aria-checked="' + clear2 + '" aria-label="' + t.clrT + '"></button>' +
-      '</div>';
     a.innerHTML = '<button class="btn-primary" ' + (joined < 4 ? "disabled" : "") + '>' +
       (joined < 4 ? t.needFour : t.start) + '</button>';
-    document.getElementById("minus").onclick = () => { if (cap > 4 && cap > joined) { cap--; draw(); } };
-    document.getElementById("plus").onclick  = () => { if (cap < 8) { cap++; draw(); } };
-    document.getElementById("sw").onclick    = () => { clear2 = !clear2; draw(); };
-    document.getElementById("rminus").onclick = () => { if (rounds > 3) { rounds--; draw(); } };
-    document.getElementById("rplus").onclick  = () => { rounds++; draw(); };
-    document.getElementById("swTax").onclick  = () => { taxOn = !taxOn; draw(); };
   } else {
-    c.innerHTML =
-      '<div class="opt"><div><div class="opt__t">' + t.capT + '</div>' +
-      '<div class="opt__d">' + t.capDG + '</div></div>' +
-      '<div class="stepper"><span style="padding:0 12px">' + cap + '</span></div></div>' +
-      '<div class="opt"><div><div class="opt__t">' + t.rndT + '</div>' +
-      '<div class="opt__d">' + t.rndDG + '</div></div>' +
-      '<div class="stepper"><span style="padding:0 12px">' + t.rndU(rounds) + '</span></div></div>' +
-      '<div class="opt"><div><div class="opt__t">' + t.taxT + '</div>' +
-      '<div class="opt__d">' + (taxOn ? t.on : t.off) + '</div></div>' +
-      '<button class="sw" role="switch" aria-checked="' + taxOn + '" disabled></button></div>' +
-      '<div class="opt"><div><div class="opt__t">' + t.clrT + '</div>' +
-      '<div class="opt__d">' + (clear2 ? t.on : t.off) + '</div></div>' +
-      '<button class="sw" role="switch" aria-checked="' + clear2 + '" disabled></button></div>';
     a.innerHTML = '<div class="waiting">' + t.wait + '<span class="dots"></span></div>';
   }
 }
 
-function draw(){ renderSeats(); renderControls();
+function draw(){ syncOpts(); renderSeats(); renderControls();
+  const sm2 = document.getElementById("sum");
+  anchorSeats(document.getElementById("seats"), sm2 ? sm2.getBoundingClientRect().top - 6 : 0);
   window.__opts = {rounds: rounds, tax: taxOn, clear2: clear2, cap: cap};
 }
 draw();
 window.addEventListener("resize", draw);
+window.addEventListener("optschange", draw);
 
 document.querySelectorAll("#lang button").forEach(b => {
   b.addEventListener("click", () => {
@@ -1787,10 +1893,30 @@ function ordEn(n){
 }
 function rankLabel(r){ return lang === "ko" ? (r + 1) + "등" : ordEn(r + 1); }
 
-const RING = {cx: 49, cy: 44, rx: 36, ry: 16};
+
+/* 배경 그림 속 초록 타원의 실제 화면 좌표(cover 기준) */
+const OV = {iw: 853, ih: 1844, cx: 0.4994, cy: 0.4415, rx: 0.4250, ry: 0.1720};
+function ovalRect(W, H){
+  const s = Math.max(W / OV.iw, H / OV.ih);
+  const dw = OV.iw * s, dh = OV.ih * s;
+  const ox = (W - dw) / 2, oy = (H - dh) / 2;
+  return {cx: (ox + OV.cx * dw) / W * 100, cy: (oy + OV.cy * dh) / H * 100,
+          rx: (OV.rx * dw) / W * 100,      ry: (OV.ry * dh) / H * 100};
+}
+let RING = {cx: 49, cy: 44, rx: 33, ry: 13.5};
+function syncRing(){
+  const sec = window.document.getElementById("tax");
+  const b = sec ? sec.getBoundingClientRect() : {width: 390, height: 844};
+  RING = ovalRect(b.width, b.height);
+  const m = el("mid");
+  if (m){ m.style.left = RING.cx + "%"; m.style.top = RING.cy + "%"; }
+}
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
-  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
+  const s = Math.sin(a);
+  /* 이름표가 아래로 달려서, 아래쪽 자리는 그만큼 더 바깥으로 빼야 위와 대칭이 된다 */
+  const bias = s > 0.25 ? 3.4 * s : 0;
+  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + s * RING.ry + bias};
 }
 
 /* from/to: 자리 번호, -1이면 가운데 */
@@ -1874,7 +2000,28 @@ function runTax(){
   });
 }
 
+
+
+/* 자리 상자가 아니라 '아바타의 중심'이 타원 위에 오도록 보정하고,
+   화면이나 아래 UI를 넘으면 그만큼 안으로 당긴다 */
+function anchorSeats(box, limitBottom){
+  const root = window.document.documentElement;
+  const W = (window.document.getElementById("stage") || root).getBoundingClientRect();
+  box.querySelectorAll(".seat").forEach(s => {
+    const av = s.querySelector(".seat__av");
+    if (!av) return;
+    const dy = av.offsetTop + av.offsetHeight / 2;
+    s.style.transform = "translate(-50%," + (-dy) + "px)";
+    const r = s.getBoundingClientRect();
+    let ox = 0, oy = 0;
+    if (r.left < W.left + 3) ox = (W.left + 3) - r.left;
+    else if (r.right > W.right - 3) ox = (W.right - 3) - r.right;
+    if (limitBottom && r.bottom > limitBottom) oy = limitBottom - r.bottom;
+    if (ox || oy) s.style.transform = "translate(calc(-50% + " + ox + "px)," + (-dy + oy) + "px)";
+  });
+}
 function renderSeats(){
+  syncRing();
   const box = el("seats"); box.innerHTML = "";
   for (let i = 0; i < N; i++){
     const p = seatPos(i), r = rankOf(i), n = N;
@@ -1891,6 +2038,8 @@ function renderSeats(){
       '<span class="seat__n">' + nameOf(i) + '</span>';
     box.appendChild(d);
   }
+  const hn = el("hint");
+  anchorSeats(box, hn ? hn.getBoundingClientRect().top - 4 : 0);
 }
 
 function renderHand(){
@@ -1998,6 +2147,8 @@ function renderBottom(){
 
 function draw(){
   renderSeats(); renderMid(); renderHand(); renderBottom();
+  const hn = el("hint");
+  anchorSeats(el("seats"), hn ? hn.getBoundingClientRect().top - 4 : 0);
   if (step >= 1) window.__myRankIdx = rankOf(0);
 }
 
@@ -2273,11 +2424,37 @@ function cardHTML(n, w){
     '<span class="card__num">' + n + '</span></div></div>';
 }
 
-/* 배경 그림의 초록 타원 (화면 기준 x 17~81%, y 40~65%) 바로 바깥에 앉힌다 */
-const RING = {cx: 49, cy: 43, rx: 36, ry: 14.5};
+
+/* 배경 그림 속 초록 타원의 실제 화면 좌표(cover 기준) */
+const OV = {iw: 853, ih: 1844, cx: 0.4994, cy: 0.4415, rx: 0.4250, ry: 0.1720};
+function ovalRect(W, H){
+  const s = Math.max(W / OV.iw, H / OV.ih);
+  const dw = OV.iw * s, dh = OV.ih * s;
+  const ox = (W - dw) / 2, oy = (H - dh) / 2;
+  return {cx: (ox + OV.cx * dw) / W * 100, cy: (oy + OV.cy * dh) / H * 100,
+          rx: (OV.rx * dw) / W * 100,      ry: (OV.ry * dh) / H * 100};
+}
+let RING = {cx: 49, cy: 43, rx: 33, ry: 13.5};
+function syncRing(){
+  const sec = window.document.getElementById("table");
+  const b = sec ? sec.getBoundingClientRect() : {width: 390, height: 844};
+  RING = ovalRect(b.width, b.height);
+  const p = el("pile");
+  if (p){ p.style.left = RING.cx + "%"; p.style.top = RING.cy + "%"; }
+  const ph = el("ring") && el("ring").querySelector(".pile__hint");
+  return RING;
+}
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / SEATS.length);
-  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
+  const s = Math.sin(a);
+  /* 이름표가 아래로 달려서, 아래쪽 자리는 그만큼 더 바깥으로 빼야 위와 대칭이 된다 */
+  const bias = s > 0.25 ? 3.4 * s : 0;
+  /* 눈으로 본 미세 보정 */
+  const side = Math.abs(s) < 0.05;                    // 좌우 끝자리
+  const nudge = s > 0.9 ? 9 : (side ? 4 : (s > 0.25 ? 2 : 0));
+  const nudgeX = side ? (Math.cos(a) < 0 ? 2 : -2) : 0;   // 좌우 끝은 바깥으로
+  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + s * RING.ry + bias,
+          nudge: nudge, nudgeX: nudgeX};
 }
 
 function maxCount(n){
@@ -2311,7 +2488,29 @@ function fanHTML(c){
   return s + '</div>';
 }
 
+
+
+/* 자리 상자가 아니라 '아바타의 중심'이 타원 위에 오도록 보정하고,
+   화면이나 아래 UI를 넘으면 그만큼 안으로 당긴다 */
+function anchorSeats(box, limitBottom){
+  const root = window.document.documentElement;
+  const W = (window.document.getElementById("stage") || root).getBoundingClientRect();
+  box.querySelectorAll(".seat").forEach(s => {
+    const av = s.querySelector(".seat__av");
+    if (!av) return;
+    const nudge = +(s.dataset.nudge || 0), nx = +(s.dataset.nudgex || 0);
+    const dy = av.offsetTop + av.offsetHeight / 2 + nudge;
+    s.style.transform = "translate(calc(-50% + " + nx + "px)," + (-dy) + "px)";
+    const r = s.getBoundingClientRect();
+    let ox = nx, oy = 0;
+    if (r.left < W.left + 1) ox = nx + ((W.left + 1) - r.left);
+    else if (r.right > W.right - 1) ox = nx + ((W.right - 1) - r.right);
+    if (limitBottom && r.bottom > limitBottom) oy = limitBottom - r.bottom;
+    if (ox !== nx || oy) s.style.transform = "translate(calc(-50% + " + ox + "px)," + (-dy + oy) + "px)";
+  });
+}
 function renderSeats(){
+  syncRing();
   const box = el("seats"); box.innerHTML = "";
   SEATS.forEach((s, i) => {
     const p = seatPos(i);
@@ -2320,6 +2519,8 @@ function renderSeats(){
       (turn === i && !busy ? " seat--turn" : "") +
       (s.s === "pass" ? " seat--pass" : "") + (s.c === 0 ? " seat--out" : "");
     d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    d.dataset.nudge = p.nudge || 0;
+    d.dataset.nudgex = p.nudgeX || 0;
     const big = SEATS.length <= 6;
     d.style.setProperty("--av", (big ? 44 : 34) + "px");
     d.style.setProperty("--fs", (big ? 10.5 : 9) + "px");
@@ -2333,6 +2534,8 @@ function renderSeats(){
       '<span class="seat__c">' + T[lang].left(s.c) + '</span>';
     box.appendChild(d);
   });
+  const nd = el("need");
+  anchorSeats(box, nd ? nd.getBoundingClientRect().top - 4 : 0);
 }
 
 function renderPile(){
@@ -2426,7 +2629,11 @@ function renderBottom(){
   el("pass").disabled = turn !== 0 || busy;
 }
 
-function draw(){ renderSeats(); renderPile(); renderHand(); renderBottom(); }
+function draw(){
+  renderSeats(); renderPile(); renderHand(); renderBottom();
+  const nd = el("need");
+  anchorSeats(el("seats"), nd ? nd.getBoundingClientRect().top - 4 : 0);
+}
 
 let timerId = null;
 function resetTimer(){
@@ -2606,6 +2813,72 @@ document.addEventListener("click", e => {
   if (e.target.closest("[data-cfgclose]")) document.getElementById("cfg").classList.remove("on");
 });
 
+/* ---------- 방 설정 (로비의 방 만들기 / 대기실의 변경) ---------- */
+window.__opts = window.__opts || {cap: 6, rounds: 5, tax: true, clear2: false};
+let optMode = "create";
+const OPT_T = {
+  ko:{ create:"방 만들기", edit:"방 설정", goCreate:"방 만들기", goEdit:"확인",
+       cap:["방 인원","4명 – 8명"],
+       rnd:["플레이 판 수 설정","최소 3판부터 시작"],
+       tax:["세금과 혁명","등수에 따라 카드를 교환하고, 조커 두 장으로 순위를 뒤집는 규칙입니다."],
+       cut:["2번 컷","2번 카드를 내면 바닥을 비우고 다시 선을 잡습니다."], unit:"판" },
+  en:{ create:"Create a room", edit:"Room settings", goCreate:"Create room", goEdit:"Done",
+       cap:["Table size","4 – 8 players"],
+       rnd:["Number of rounds","Three at least"],
+       tax:["Tax and revolution","Cards change hands by standing, and two jokers overturn it."],
+       cut:["Two-cut","Playing a 2 clears the pile and you lead again."], unit:"" }
+};
+function optRow(pair, right){
+  return '<div class="mk__row"><div><div class="mk__t">' + pair[0] + '</div>' +
+    '<div class="mk__d">' + pair[1] + '</div></div>' + right + '</div>';
+}
+function optStep(k, v, lo, hi, unit){
+  return '<div class="mk__st">' +
+    '<button data-opt="' + k + '-"' + (v <= lo ? " disabled" : "") + '>−</button>' +
+    '<span>' + v + (unit || "") + '</span>' +
+    '<button data-opt="' + k + '+"' + (v >= hi ? " disabled" : "") + '>+</button></div>';
+}
+function optSw(k, on){
+  return '<button class="mk__sw" data-opt="' + k + '" role="switch" aria-checked="' + on + '"></button>';
+}
+function optRender(){
+  const t = OPT_T[window.__lang] || OPT_T.ko, o = window.__opts;
+  document.getElementById("optT").textContent = optMode === "create" ? t.create : t.edit;
+  document.getElementById("optGo").textContent = optMode === "create" ? t.goCreate : t.goEdit;
+  document.getElementById("optBody").innerHTML =
+    optRow(t.cap, optStep("cap", o.cap, 4, 8)) +
+    optRow(t.rnd, optStep("rnd", o.rounds, 3, 99, t.unit)) +
+    optRow(t.tax, optSw("tax", o.tax)) +
+    optRow(t.cut, optSw("cut", o.clear2));
+}
+function openOpts(mode){
+  optMode = mode; optRender();
+  document.getElementById("opts").classList.add("on");
+}
+document.addEventListener("click", e => {
+  const k = e.target.closest("[data-opt]");
+  if (k){
+    const o = window.__opts, v = k.dataset.opt;
+    if (v === "cap-") o.cap = Math.max(4, o.cap - 1);
+    if (v === "cap+") o.cap = Math.min(8, o.cap + 1);
+    if (v === "rnd-") o.rounds = Math.max(3, o.rounds - 1);
+    if (v === "rnd+") o.rounds = o.rounds + 1;
+    if (v === "tax") o.tax = !o.tax;
+    if (v === "cut") o.clear2 = !o.clear2;
+    optRender();
+  }
+  if (e.target.closest("[data-optclose]")) document.getElementById("opts").classList.remove("on");
+  if (e.target.closest("[data-optopen]")) openOpts("edit");
+});
+document.getElementById("optGo").addEventListener("click", () => {
+  document.getElementById("opts").classList.remove("on");
+  if (optMode === "create") setTimeout(() => go("room"), 80);
+  else window.dispatchEvent(new Event("optschange"));
+});
+window.addEventListener("langchange", () => {
+  if (document.getElementById("opts").classList.contains("on")) optRender();
+});
+
 const CFG_T = {
   ko:{ title:"설정", lang:"언어",
        note:"처음 들어오면 기기 언어에 맞춰 자동으로 정해집니다. 여기서 바꾸면 그 선택을 기억합니다." },
@@ -2642,10 +2915,12 @@ function go(id){
 document.querySelector("#entry #start").addEventListener("click", () => go("lobby"));
 
 /* 로비 → 대기실 */
-["#lobby #btQuick", "#lobby #btNew", "#lobby #btJoin"].forEach(sel => {
+["#lobby #btQuick", "#lobby #btJoin"].forEach(sel => {
   const b = document.querySelector(sel);
   if (b) b.addEventListener("click", () => go("room"));
 });
+/* 방 만들기는 설정을 먼저 받는다 */
+document.querySelector("#lobby #btNew").addEventListener("click", () => openOpts("create"));
 /* 대기실 시작 → 세금·혁명 */
 document.querySelector("#room #action").addEventListener("click", e => {
   const b = e.target.closest(".btn-primary");
