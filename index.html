@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="theme-color" content="#140E0A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="동물의 왕국 — 계급 카드게임">
+<link rel="icon" href="assets/card_01.webp">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>동물의 왕국 : 계급 카드게임</title>
+<link id="webfonts" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700;900&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Playfair+Display:wght@700&display=swap">
+<style>
+:root{
+  --card-ink:#3B2A12; --card-ink-2:#5A431C;
+  --gold:#C79A3E; --gold-hi:#F0D18C; --gold-dim:#8A6A24;
+  --parchment:#F2E2BE; --parchment-dim:#C9B58C;
+  --p1:#D6C097; --p2:#C4AA7B; --p3:#AE9362;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#0B0803;color:var(--parchment);
+  font-family:"Gowun Dodum",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+
+/* ---------- 배경 ---------- */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0}
+.bg__img{position:absolute;inset:-3%;background:url("assets/bg.webp") center/cover no-repeat}
+@media (prefers-reduced-motion:no-preference){
+  .bg__img{animation:drift 34s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:scale(1.04) translate(0,0)}to{transform:scale(1.1) translate(-1.4%,-1.6%)}}
+}
+.bg__top{position:absolute;left:0;right:0;top:0;height:34%;
+  background:linear-gradient(180deg,rgba(6,4,2,.7),rgba(6,4,2,.28) 58%,transparent)}
+.bg__bot{position:absolute;left:0;right:0;bottom:0;height:34%;
+  background:linear-gradient(180deg,transparent,rgba(8,5,2,.5) 52%,rgba(6,4,2,.88) 86%,#0B0803)}
+.motes{position:absolute;inset:0;pointer-events:none}
+.mote{position:absolute;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,232,178,.95),rgba(220,170,80,0) 68%)}
+@media (prefers-reduced-motion:no-preference){
+  .mote{animation:rise linear infinite}
+  @keyframes rise{
+    from{transform:translate3d(0,0,0);opacity:0}
+    14%{opacity:.9}86%{opacity:.6}
+    to{transform:translate3d(18px,-92vh,0);opacity:0}}
+}
+
+/* ---------- 화면 ---------- */
+.screen{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 14px) 18px calc(env(safe-area-inset-bottom) + 22px)}
+.lang{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:16px;z-index:20;
+  display:flex;border:1px solid rgba(199,154,62,.66);border-radius:2px;overflow:hidden;
+  background:rgba(10,7,3,.5);backdrop-filter:blur(4px)}
+.lang button{padding:6px 11px;font-size:11.5px;letter-spacing:.08em;color:var(--parchment-dim)}
+.lang button[aria-pressed="true"]{color:#140D04;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+
+.spacer{flex:1;min-height:0}
+
+/* ---------- 아래 부채꼴 ---------- */
+.fan{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:3}
+.fan__in{position:absolute;left:63%;top:55%;transform:translate(-50%,-50%);width:0;height:0}
+.fan .card{position:absolute;transform-origin:50% 168%;box-shadow:0 16px 32px rgba(0,0,0,.8)}
+.fan .card[data-i="0"]{transform:rotate(-21deg);filter:brightness(.8) saturate(.94);z-index:1}
+.fan .card[data-i="1"]{transform:rotate(-10.5deg);filter:brightness(.92);z-index:2}
+.fan .card[data-i="2"]{transform:translateY(-10px) scale(1.07);z-index:5}
+.fan .card[data-i="3"]{transform:rotate(10.5deg);filter:brightness(.92);z-index:4}
+.fan .card[data-i="4"]{transform:rotate(21deg);filter:brightness(.8) saturate(.94);z-index:3}
+
+.card{--w:80px;width:var(--w);aspect-ratio:200/390;flex:none;
+  border-radius:calc(var(--w) * .05);padding:calc(var(--w) * .042);
+  background:
+    radial-gradient(38% 22% at 16% 12%,rgba(140,106,52,.16),transparent 70%),
+    radial-gradient(44% 24% at 70% 92%,rgba(112,82,38,.18),transparent 74%),
+    repeating-linear-gradient(96deg,rgba(96,70,32,.045) 0 1px,transparent 1px 4px),
+    linear-gradient(162deg,var(--p1),var(--p2) 52%,var(--p3));
+  box-shadow:inset 0 0 calc(var(--w) * .09) rgba(108,78,34,.34);
+  display:flex;flex-direction:column}
+.card__band{display:flex;align-items:center;justify-content:space-between;
+  padding:0 calc(var(--w) * .016);height:calc(var(--w) * .208);color:var(--card-ink)}
+.card__num{font-family:"Noto Serif KR",serif;font-weight:900;font-size:calc(var(--w) * .152);
+  line-height:1;min-width:calc(var(--w) * .145);text-align:center}
+.card__name{font-family:"Noto Serif KR",serif;font-weight:700;font-size:calc(var(--w) * .086);
+  letter-spacing:.03em;white-space:nowrap;color:var(--card-ink-2)}
+body[data-lang="en"] .card__name{font-size:calc(var(--w) * .073);letter-spacing:.01em}
+.card.is-joker .card__band{justify-content:center}
+.card__mark{font-family:"Noto Serif KR",serif;font-weight:600;font-size:calc(var(--w) * .072);
+  letter-spacing:.24em;text-indent:.24em;color:var(--card-ink-2)}
+.card__art{flex:1;min-height:0;position:relative;
+  border:calc(var(--w) * .011) solid var(--gold-dim);background:#1A1410;overflow:hidden}
+.card__art img{width:100%;height:100%;object-fit:cover;display:block}
+.card__art::after{content:"";position:absolute;inset:0;
+  box-shadow:inset 0 0 0 calc(var(--w) * .011) rgba(240,209,140,.4)}
+.plate{position:absolute;left:20px;right:20px;top:19.5%;z-index:3;
+  text-align:center;text-shadow:0 3px 16px rgba(0,0,0,.92),0 1px 4px rgba(0,0,0,.85)}
+.plate::before{content:"";position:absolute;left:-14%;right:-14%;top:-34px;bottom:-26px;
+  z-index:-1;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(6,4,2,.72),rgba(6,4,2,.34) 58%,transparent 100%)}
+.eyebrow{font-family:"Noto Serif KR",serif;font-weight:600;font-size:12.5px;
+  letter-spacing:.34em;text-indent:.34em;color:#E9BE63}
+.wordmark{font-family:"Gowun Batang",serif;font-weight:700;
+  font-size:clamp(33px,9.4vw,42px);line-height:1.16;margin:13px 0 10px}
+body[data-lang="en"] .wordmark{font-family:"Playfair Display",serif;font-size:clamp(35px,10vw,45px)}
+.sub{font-size:14px;color:#DCC69C;letter-spacing:.06em}
+.hr{height:1px;margin:17px 52px 0;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.7}
+.btn{width:100%;padding:16px;border-radius:2px;
+  background:linear-gradient(180deg,#8A2A28,#4E1614);border:1px solid var(--gold);
+  color:var(--parchment);font-family:"Gowun Batang",serif;font-weight:700;
+  font-size:17px;letter-spacing:.08em;
+  box-shadow:0 1px 0 rgba(240,209,140,.3) inset,0 8px 24px rgba(0,0,0,.66)}
+body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
+.btn:active{transform:translateY(1px)}
+
+@media (prefers-reduced-motion:no-preference){
+  .fan .card{animation:deal .6s cubic-bezier(.2,.7,.3,1) both}
+  .fan .card[data-i="0"]{animation-delay:.5s}
+  .fan .card[data-i="4"]{animation-delay:.57s}
+  .fan .card[data-i="1"]{animation-delay:.64s}
+  .fan .card[data-i="3"]{animation-delay:.71s}
+  .fan .card[data-i="2"]{animation-delay:.8s}
+  @keyframes deal{from{opacity:0;transform:translateY(34px) rotate(0deg) scale(.9)}}
+  .plate>*{animation:rise2 .7s ease both}
+  .eyebrow{animation-delay:.15s}
+  .wordmark{animation-delay:.28s}
+  .sub{animation-delay:.4s}
+  .hr{animation-delay:.5s}
+  .btn{animation:rise2 .6s ease both;animation-delay:.62s}
+  @keyframes rise2{from{opacity:0;transform:translateY(12px)}}
+}
+
+.page{display:none}
+.page.is-on{display:block}
+#entry{position:fixed;inset:0;overflow:hidden}
+#lobby,#room,#draw,#tax,#table{position:fixed;inset:0;z-index:30;overflow:hidden}
+.navback{font-size:19px;line-height:1;color:#B8A47E;padding:2px 6px;background:none;border:none;cursor:pointer}
+
+#lobby{
+  --ink:#140E0A;
+  --card-ink:#3B2A12;
+  --card-ink-2:#5A431C;
+  --gold:#B08A34;
+  --gold-hi:#E3C67C;
+  --gold-dim:#7A5E24;
+  --parchment:#E9D5AC;
+  --parchment-dim:#B8A47E;
+  --p1:#D6C097; --p2:#C4AA7B; --p3:#AE9362;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+#lobby, #lobby{height:100%}
+#lobby{
+  background:
+    radial-gradient(112% 50% at 50% 0%,rgba(122,34,38,.42),transparent 64%),
+    radial-gradient(84% 44% at 50% 104%,rgba(176,138,52,.12),transparent 70%),
+    var(--ink);
+  color:var(--parchment);
+  font-family:"Gowun Dodum",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+#lobby button, #lobby input{font:inherit;color:inherit;background:none;border:none}
+#lobby button{cursor:pointer}
+#lobby :focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+
+#lobby .screen{
+  height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 20px);
+}
+
+#lobby /* ---------- header ---------- */
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+#lobby .mark{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.03em}
+#lobby body[data-lang="en"] .mark{font-family:"Playfair Display",serif;font-size:18px}
+#lobby .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+#lobby .lang button{padding:5px 10px;font-size:11px;letter-spacing:.08em;color:var(--parchment-dim)}
+#lobby .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+
+#lobby /* ---------- body ---------- */
+.body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:22px}
+#lobby .block__label{
+  font-family:"Noto Serif KR",serif;font-weight:600;
+  font-size:11px;letter-spacing:.28em;text-indent:.28em;color:var(--gold);
+  margin-bottom:9px;
+}
+#lobby .btn-primary{
+  width:100%;padding:17px;border-radius:2px;
+  background:linear-gradient(180deg,#7A2226,#4A1418);
+  border:1px solid var(--gold);
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:18px;letter-spacing:.08em;
+  box-shadow:0 1px 0 rgba(227,198,124,.26) inset,0 6px 18px rgba(0,0,0,.5);
+}
+#lobby .btn-second{
+  width:100%;padding:15px;border-radius:2px;
+  border:1px solid var(--gold);
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.06em;
+  color:var(--parchment);
+  background:rgba(176,138,52,.07);
+}
+#lobby body[data-lang="en"] .btn-primary, #lobby body[data-lang="en"] .btn-second{font-family:"Playfair Display",serif;letter-spacing:.08em}
+#lobby .btn-primary:active, #lobby .btn-second:active{transform:translateY(1px)}
+#lobby .hint{font-size:12px;color:#8E8064;margin-top:8px;line-height:1.65}
+
+#lobby .join{display:flex;gap:9px}
+#lobby .join input{
+  flex:1;min-width:0;padding:14px 15px;border-radius:2px;
+  border:1px solid var(--gold-dim);background:rgba(0,0,0,.34);
+  font-family:"Noto Serif KR",serif;font-weight:700;
+  font-size:20px;letter-spacing:.42em;text-align:center;color:var(--parchment);
+}
+#lobby .join input::placeholder{color:#6E6046;font-weight:600}
+#lobby .join button{
+  padding:0 20px;border-radius:2px;border:1px solid var(--gold-dim);
+  font-size:14px;letter-spacing:.05em;color:var(--parchment-dim);white-space:nowrap;
+}
+#lobby .btn-rules{
+  width:100%;padding:13px;border-radius:2px;border:1px solid var(--gold-dim);
+  font-size:14px;letter-spacing:.06em;color:var(--parchment-dim);
+}
+
+#lobby /* ---------- rules sheet ---------- */
+.sheet{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:flex-end;visibility:hidden}
+#lobby .sheet.is-open{visibility:visible}
+#lobby .sheet__veil{position:absolute;inset:0;background:rgba(6,4,2,.72);opacity:0;transition:opacity .28s ease}
+#lobby .sheet.is-open .sheet__veil{opacity:1}
+#lobby .sheet__panel{
+  position:relative;max-height:90%;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#241811,#150E09);
+  border-top:1px solid var(--gold);border-radius:10px 10px 0 0;
+  transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.3,1);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#lobby .sheet.is-open .sheet__panel{transform:none}
+#lobby .sheet__head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 12px;border-bottom:1px solid #33261A;
+}
+#lobby .sheet__title{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px}
+#lobby body[data-lang="en"] .sheet__title{font-family:"Playfair Display",serif}
+#lobby .sheet__close{font-size:22px;line-height:1;color:var(--parchment-dim);padding:0 4px}
+#lobby .sheet__body{overflow-y:auto;padding:16px 20px 26px;-webkit-overflow-scrolling:touch}
+
+#lobby .lead{font-size:13.5px;line-height:1.75;color:#C9B792;margin-bottom:18px}
+#lobby .lead b{color:var(--gold-hi);font-weight:400}
+
+#lobby /* rank grid */
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px 4px;margin-bottom:22px}
+#lobby .cell{display:flex;flex-direction:column;align-items:center;gap:5px}
+#lobby .cell__c{font-size:10px;color:#7C6C4E;line-height:1}
+
+#lobby /* mini card */
+.card{
+  --w:100%;
+  width:100%;
+  aspect-ratio:200/390;
+  border-radius:3px;
+  padding:2px;
+  background:
+    radial-gradient(38% 22% at 16% 12%,rgba(140,106,52,.16),transparent 70%),
+    radial-gradient(44% 24% at 70% 92%,rgba(112,82,38,.18),transparent 74%),
+    linear-gradient(162deg,var(--p1),var(--p2) 52%,var(--p3));
+  box-shadow:0 2px 5px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;
+}
+#lobby .card__band{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1px;height:12px;color:var(--card-ink);
+}
+#lobby .card__num{font-family:"Noto Serif KR",serif;font-weight:900;font-size:8.5px;line-height:1}
+#lobby .card__name{
+  font-family:"Noto Serif KR",serif;font-weight:700;
+  font-size:7px;line-height:1;letter-spacing:-.01em;
+  color:var(--card-ink-2);white-space:nowrap;
+}
+#lobby body[data-lang="en"] .card__name{font-size:5.4px;letter-spacing:.01em}
+#lobby .card__art{
+  flex:1;min-height:0;position:relative;
+  border:1px solid var(--gold-dim);background:#1A1410;overflow:hidden;
+}
+#lobby .card__art img{width:100%;height:100%;object-fit:cover;display:block}
+
+#lobby /* rules text */
+.rule{margin-bottom:16px}
+#lobby .rule--joker{display:flex;gap:13px;align-items:flex-start}
+#lobby .rule--joker .jk{width:calc((100% - 20px) / 6);flex:none}
+#lobby .rule h3{font-family:"Gowun Batang",serif;font-weight:700;font-size:14px;color:var(--gold-hi);margin-bottom:5px}
+#lobby body[data-lang="en"] .rule h3{font-family:"Playfair Display",serif}
+#lobby .rule p{font-size:13px;line-height:1.75;color:#B7A683}
+#lobby .rule p b{color:var(--gold-hi);font-weight:400}
+
+
+#draw{
+  --card-ink:#3B2A12; --card-ink-2:#5A431C;
+  --gold:#B08A34; --gold-hi:#E3C67C; --gold-dim:#7A5E24;
+  --parchment:#E9D5AC; --parchment-dim:#B8A47E;
+  --p1:#D6C097; --p2:#C4AA7B; --p3:#AE9362;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+#draw, #draw{height:100%}
+#draw{background:radial-gradient(96% 44% at 50% 34%,#2E5540,#16291F 54%,#0B140F);
+  color:var(--parchment);font-family:"Gowun Dodum",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+#draw button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+#draw :focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+#draw .screen{height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 12px)}
+
+#draw .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 2px}
+#draw .bar__t{font-family:"Gowun Batang",serif;font-weight:700;font-size:13.5px;color:#CFE0D4}
+#draw .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+#draw .lang button{padding:4px 8px;font-size:10px;color:var(--parchment-dim)}
+#draw .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+
+#draw .ring{height:66%;flex:none;position:relative;margin-top:4px}
+#draw .plane{position:absolute;left:0;right:0;top:19%;bottom:13%}
+#draw .pad{flex:1;min-height:0}
+#draw .felt{position:absolute;left:2%;right:2%;top:2%;bottom:2%;border-radius:50%;
+  background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
+  box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4)}
+
+#draw .seat{position:absolute;width:74px;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6}
+#draw .seat__av{width:42px;height:42px;border-radius:50%;object-fit:cover;
+  border:2px solid rgba(198,154,60,.55);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6);
+  transition:border-color .3s ease}
+#draw .seat--me .seat__av{width:46px;height:46px;border-color:#E3C67C}
+#draw .seat--turn .seat__av{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(227,198,124,.3),0 3px 9px rgba(0,0,0,.6)}
+#draw .seat--tie .seat__av{border-color:#E36C4C;box-shadow:0 0 0 3px rgba(227,108,76,.3)}
+#draw .seat__n{font-size:10.5px;line-height:1.2;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#draw .seat__d{font-family:"Noto Serif KR",serif;font-weight:900;font-size:11px;
+  color:#120C07;background:linear-gradient(180deg,#E3C67C,#B08A34);
+  padding:1px 8px;border-radius:8px;line-height:16px;
+  box-shadow:0 2px 6px rgba(0,0,0,.6)}
+#draw .seat__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:10.5px;
+  padding:1px 7px;border-radius:2px;white-space:nowrap;
+  background:rgba(10,16,12,.9);border:1px solid var(--gold-dim);color:var(--gold-hi);
+  opacity:0;transform:translateY(-4px);transition:opacity .35s ease,transform .35s ease}
+#draw .seat__r.on{opacity:1;transform:none}
+
+#draw /* 바닥에 깔린 뽑을 카드 */
+.deck{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+  display:grid;grid-template-columns:repeat(var(--cols,4),var(--pw,44px));
+  gap:9px;justify-content:center;z-index:5;--pw:34px}
+#draw .pk{width:var(--pw,34px);aspect-ratio:200/390;perspective:600px;cursor:pointer;
+  transition:transform .3s ease,opacity .35s ease}
+#draw .pk__in{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.3,.8,.3,1)}
+#draw .pk.flip .pk__in{transform:rotateY(180deg)}
+#draw .pk__f{position:absolute;inset:0;backface-visibility:hidden;border-radius:4px;overflow:hidden;
+  box-shadow:0 5px 14px rgba(0,0,0,.6)}
+#draw .pk__f--b{background:#1A1410;border:1px solid rgba(198,154,60,.5)}
+#draw .pk__f--b img{width:100%;height:100%;object-fit:cover;display:block}
+#draw .pk__f--a{transform:rotateY(180deg)}
+#draw .pk:not(.taken):hover{transform:translateY(-6px)}
+#draw .pk.taken{cursor:default;opacity:.62}
+#draw .pk.gone{opacity:0;transform:scale(.86)}
+
+#draw .card{--w:52px;width:100%;height:100%;
+  border-radius:4px;padding:calc(var(--w) * .042);
+  background:radial-gradient(38% 22% at 16% 12%,rgba(140,106,52,.16),transparent 70%),
+    linear-gradient(162deg,var(--p1),var(--p2) 52%,var(--p3));
+  display:flex;flex-direction:column}
+#draw .card__band{display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px;height:calc(var(--w) * .2);color:var(--card-ink)}
+#draw .card__num{font-family:"Noto Serif KR",serif;font-weight:900;font-size:calc(var(--w) * .2);line-height:1}
+#draw .card__art{flex:1;min-height:0;border:1px solid var(--gold-dim);background:#1A1410;overflow:hidden}
+#draw .card__art img{width:100%;height:100%;object-fit:cover;display:block}
+
+#draw .mid{margin:6px auto 0;width:min(300px,88%);text-align:center;flex:none}
+#draw .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;margin-bottom:6px}
+#draw .mid__s{font-size:12.5px;color:#A9C0B0;line-height:1.7}
+#draw .mid__s b{color:var(--gold-hi);font-weight:400}
+
+#draw .acts{display:flex;gap:9px;margin-top:10px}
+#draw .acts button{flex:1;padding:15px;border-radius:2px;
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.04em}
+#draw .bt-main{background:linear-gradient(180deg,#7A2226,#4A1418);border:1px solid var(--gold);
+  box-shadow:0 1px 0 rgba(227,198,124,.24) inset,0 5px 14px rgba(0,0,0,.5)}
+#draw .acts button:disabled{opacity:.36;box-shadow:none}
+
+
+#room{
+  --ink:#140E0A;
+  --gold:#B08A34; --gold-hi:#E3C67C; --gold-dim:#7A5E24;
+  --parchment:#E9D5AC; --parchment-dim:#B8A47E;
+  --felt-1:#2C5340; --felt-2:#172C21;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+#room, #room{height:100%}
+#room{
+  background:
+    radial-gradient(110% 46% at 50% 0%,rgba(122,34,38,.36),transparent 62%),
+    var(--ink);
+  color:var(--parchment);
+  font-family:"Gowun Dodum",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow:hidden;
+}
+#room button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+#room :focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+
+#room .screen{
+  height:100%;display:flex;flex-direction:column;overflow-y:auto;
+  padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);
+}
+
+#room /* ---------- top ---------- */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#room .back{font-size:20px;line-height:1;padding:4px 8px 6px;color:var(--parchment-dim)}
+#room .bar__t{font-family:"Gowun Batang",serif;font-weight:700;font-size:15px;letter-spacing:.04em}
+#room .view{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+#room .view button{padding:5px 9px;font-size:10.5px;letter-spacing:.06em;color:var(--parchment-dim)}
+#room .view button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+
+#room .roomno{
+  margin-top:12px;padding:12px 14px;border:1px solid var(--gold-dim);border-radius:3px;
+  background:rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+#room .roomno__l{font-size:11px;letter-spacing:.24em;color:var(--gold);margin-bottom:5px}
+#room .roomno__n{
+  font-family:"Noto Serif KR",serif;font-weight:900;
+  font-size:30px;letter-spacing:.2em;line-height:1;
+}
+#room .roomno button{
+  padding:9px 13px;border:1px solid var(--gold-dim);border-radius:2px;
+  font-size:12.5px;color:var(--parchment-dim);white-space:nowrap;
+}
+
+#room /* ---------- table ---------- */
+.tablewrap{flex:1;min-height:240px;position:relative;margin:14px 0 12px}
+#room .felt{
+  position:absolute;left:8%;right:8%;top:12%;bottom:12%;
+  border-radius:50%;
+  background:radial-gradient(72% 60% at 50% 34%,#3A6A52,var(--felt-1) 46%,var(--felt-2));
+  box-shadow:0 0 0 5px rgba(80,58,22,.72),0 0 0 7px rgba(198,154,60,.34),0 18px 40px rgba(0,0,0,.6);
+}
+#room .felt::after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  background:repeating-linear-gradient(51deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
+}
+#room .felt__c{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;width:74%;
+}
+#room .felt__n{font-family:"Gowun Batang",serif;font-weight:700;font-size:19px;color:#D9E6DC}
+#room .felt__s{font-size:11.5px;color:#8FA898;margin-top:6px;line-height:1.6}
+
+#room .seat{
+  position:absolute;width:60px;margin-left:-30px;margin-top:-34px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  text-align:center;
+}
+#room .seat__av{
+  width:46px;height:46px;border-radius:50%;
+  border:2px solid var(--gold);object-fit:cover;background:#241A12;
+  box-shadow:0 3px 10px rgba(0,0,0,.6);
+}
+#room .seat--empty .seat__av{
+  border:1.5px dashed rgba(198,154,60,.5);
+  background:rgba(0,0,0,.3);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(198,154,60,.55);font-size:17px;
+}
+#room .seat__n{font-size:11px;line-height:1.2;color:var(--parchment);white-space:nowrap;max-width:66px;overflow:hidden;text-overflow:ellipsis}
+#room .seat--empty .seat__n{color:#7B6C50}
+#room .seat__b{
+  font-size:9px;letter-spacing:.1em;color:#120C07;
+  background:linear-gradient(180deg,var(--gold-hi),var(--gold));
+  padding:1px 5px;border-radius:2px;
+}
+#room .seat--me .seat__av{border-color:#E3C67C;box-shadow:0 0 0 3px rgba(227,198,124,.22),0 3px 10px rgba(0,0,0,.6)}
+
+#room /* ---------- controls ---------- */
+.opt{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 13px;border:1px solid #33261A;border-radius:3px;margin-bottom:8px;
+  background:rgba(0,0,0,.24);
+}
+#room .opt__t{font-size:13.5px}
+#room .opt__d{font-size:11.5px;color:#8E8064;margin-top:3px;line-height:1.5}
+#room .stepper{display:flex;align-items:center;gap:2px;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden;flex:none}
+#room .stepper button{width:34px;height:32px;font-size:17px;line-height:1;color:var(--parchment-dim)}
+#room .stepper button:disabled{opacity:.32}
+#room .stepper span{
+  min-width:34px;text-align:center;
+  font-family:"Noto Serif KR",serif;font-weight:900;font-size:15px;
+}
+#room .sw{width:46px;height:26px;border-radius:13px;border:1px solid var(--gold-dim);background:rgba(0,0,0,.4);position:relative;flex:none}
+#room .sw::after{
+  content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+  background:#7B6C50;transition:transform .18s ease,background .18s ease;
+}
+#room .sw[aria-checked="true"]{background:rgba(176,138,52,.3);border-color:var(--gold)}
+#room .sw[aria-checked="true"]::after{transform:translateX(20px);background:var(--gold-hi)}
+
+#room .btn-primary{
+  width:100%;padding:16px;border-radius:2px;
+  background:linear-gradient(180deg,#7A2226,#4A1418);
+  border:1px solid var(--gold);
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.08em;
+  box-shadow:0 1px 0 rgba(227,198,124,.26) inset,0 6px 18px rgba(0,0,0,.5);
+}
+#room .btn-primary:disabled{opacity:.42;box-shadow:none}
+#room .waiting{
+  width:100%;padding:16px;border:1px solid var(--gold-dim);border-radius:2px;
+  text-align:center;font-size:14px;color:var(--parchment-dim);
+}
+#room .dots::after{content:"";animation:dots 1.4s steps(4,end) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+
+#tax{
+  --card-ink:#3B2A12; --card-ink-2:#5A431C;
+  --gold:#B08A34; --gold-hi:#E3C67C; --gold-dim:#7A5E24;
+  --parchment:#E9D5AC; --parchment-dim:#B8A47E;
+  --p1:#D6C097; --p2:#C4AA7B; --p3:#AE9362;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+#tax, #tax{height:100%}
+#tax{background:radial-gradient(96% 44% at 50% 34%,#2E5540,#16291F 54%,#0B140F);
+  color:var(--parchment);font-family:"Gowun Dodum",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+#tax button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+#tax :focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+#tax .screen{height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 10px)}
+
+#tax .bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 2px}
+#tax .bar__t{font-family:"Gowun Batang",serif;font-weight:700;font-size:13.5px;color:#CFE0D4}
+#tax .pick{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+#tax .pick button{padding:4px 7px;font-size:9.5px;letter-spacing:.03em;color:var(--parchment-dim);white-space:nowrap}
+#tax .pick button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+#tax .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden;flex:none}
+#tax .lang button{padding:4px 7px;font-size:9.5px;color:var(--parchment-dim)}
+#tax .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+
+#tax /* ring */
+.ring{flex:1;min-height:0;position:relative;margin-top:6px}
+#tax .plane{position:absolute;left:0;right:0;top:15%;bottom:11%}
+#tax .felt{position:absolute;left:2%;right:2%;top:2%;bottom:2%;border-radius:50%;
+  background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
+  box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4)}
+#tax .seat{position:absolute;width:78px;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6}
+#tax .seat__av{width:44px;height:44px;border-radius:50%;object-fit:cover;
+  border:2px solid rgba(198,154,60,.6);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6);
+  transition:border-color .3s ease,transform .45s cubic-bezier(.3,.8,.3,1)}
+#tax .seat--me .seat__av{width:48px;height:48px;border-color:#E3C67C}
+#tax .seat--top .seat__av{border-color:#E3C67C;box-shadow:0 0 0 3px rgba(227,198,124,.34),0 3px 9px rgba(0,0,0,.6)}
+#tax .seat--bot .seat__av{border-color:#6E8A76;filter:saturate(.7) brightness(.86)}
+#tax .seat__n{font-size:10.5px;line-height:1.2;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#tax .seat__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:10.5px;
+  padding:1px 7px;border-radius:2px;white-space:nowrap;
+  background:rgba(10,16,12,.9);border:1px solid var(--gold-dim);color:var(--gold-hi);
+  opacity:0;transform:translateY(-4px);transition:opacity .3s ease,transform .3s ease}
+#tax .seat__r.on{opacity:1;transform:none}
+#tax .seat--bot .seat__r{color:#A9C0B0;border-color:#3E5548}
+#tax .flip .seat__av{transform:rotate(360deg) scale(1.12)}
+
+#tax /* centre panel */
+.fx{position:absolute;inset:0;pointer-events:none;z-index:9}
+#tax .fly{position:absolute;transition:left .5s cubic-bezier(.25,.8,.3,1),top .5s cubic-bezier(.25,.8,.3,1),transform .5s cubic-bezier(.25,.8,.3,1),opacity .3s ease}
+#tax .fly .card{--w:32px}
+#tax .flash{position:absolute;inset:-20%;pointer-events:none;z-index:10;opacity:0;
+  background:radial-gradient(closest-side,rgba(255,232,170,.75),rgba(227,198,124,.2) 46%,transparent 70%)}
+#tax .flash.go{animation:burst .85s ease-out}
+@keyframes burst{0%{opacity:0;transform:scale(.5)}22%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+#tax .seat__r{transition:opacity .3s ease,transform .3s ease}
+#tax .seat__r.swap{animation:swap .7s ease both}
+@keyframes swap{0%{opacity:1}30%{opacity:0;transform:translateY(6px) scale(.8)}60%{opacity:0;transform:translateY(-6px) scale(.8)}100%{opacity:1;transform:none}}
+#tax .mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(280px,78vw);text-align:center;z-index:8}
+#tax .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:19px;margin-bottom:7px}
+#tax .mid__s{font-size:12.5px;color:#A9C0B0;line-height:1.7}
+#tax .mid__s b{color:var(--gold-hi);font-weight:400}
+#tax .flow{margin-top:12px;display:flex;flex-direction:column;gap:9px;
+  padding:12px 11px;border-radius:6px;background:rgba(8,16,11,.9);
+  border:1px solid rgba(198,154,60,.42)}
+#tax .frow{display:flex;align-items:center;gap:8px;justify-content:center}
+#tax .frow__w{font-size:10.5px;color:#9FB6A5;white-space:nowrap;min-width:74px;text-align:right}
+#tax .frow__c{display:flex;gap:3px}
+#tax .frow__c .card{animation:fly .4s cubic-bezier(.2,.8,.3,1) both}
+#tax .frow--in .frow__c .card{--fx:-70px}
+#tax .frow--out .frow__c .card{--fx:70px}
+@keyframes fly{from{opacity:0;transform:translateX(var(--fx,0)) scale(.8)}}
+#tax .rev{border-color:rgba(227,198,124,.8);box-shadow:0 0 30px rgba(227,198,124,.18)}
+
+#tax /* card */
+.card{--w:34px;width:var(--w);aspect-ratio:200/390;flex:none;
+  border-radius:calc(var(--w) * .05);padding:calc(var(--w) * .042);
+  background:radial-gradient(38% 22% at 16% 12%,rgba(140,106,52,.16),transparent 70%),
+    linear-gradient(162deg,var(--p1),var(--p2) 52%,var(--p3));
+  box-shadow:0 2px 6px rgba(0,0,0,.55);display:flex;flex-direction:column}
+#tax .card__band{display:flex;align-items:center;justify-content:space-between;
+  padding:0 calc(var(--w) * .016);height:calc(var(--w) * .208);color:var(--card-ink)}
+#tax .card__num{font-family:"Noto Serif KR",serif;font-weight:900;font-size:calc(var(--w) * .19);
+  line-height:1;min-width:calc(var(--w) * .17);text-align:center}
+#tax .card__art{flex:1;min-height:0;border:1px solid var(--gold-dim);background:#1A1410;overflow:hidden}
+#tax .card__art img{width:100%;height:100%;object-fit:cover;display:block}
+
+#tax /* hand + action */
+.hint{text-align:center;font-size:12px;color:#A9C0B0;min-height:17px;margin-bottom:5px}
+#tax .hint b{color:var(--gold-hi);font-weight:400}
+#tax .hand{position:relative;height:112px;margin-bottom:9px}
+#tax .hand .slot{position:absolute;bottom:0;transition:transform .16s ease}
+#tax .hand .card{--w:54px}
+#tax .slot--sel{transform:translateY(-18px)}
+#tax .slot--sel .card{box-shadow:0 0 0 2px var(--gold-hi),0 10px 18px rgba(0,0,0,.6)}
+#tax .slot--take .card{box-shadow:0 0 0 2px #E36C4C,0 8px 16px rgba(0,0,0,.6)}
+#tax .acts{display:flex;gap:9px}
+#tax .acts button{flex:1;padding:14px;border-radius:2px;
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.04em}
+#tax .bt-ghost{border:1px solid var(--gold-dim);color:var(--parchment-dim)}
+#tax .bt-main{background:linear-gradient(180deg,#7A2226,#4A1418);border:1px solid var(--gold);
+  box-shadow:0 1px 0 rgba(227,198,124,.24) inset,0 5px 14px rgba(0,0,0,.5)}
+#tax .bt-rev{background:linear-gradient(180deg,#8A6A1E,#5A4312);border:1px solid var(--gold-hi)}
+#tax .acts button:disabled{opacity:.36;box-shadow:none}
+
+
+#table{
+  --card-ink:#3B2A12; --card-ink-2:#5A431C;
+  --gold:#B08A34; --gold-hi:#E3C67C; --gold-dim:#7A5E24;
+  --parchment:#E9D5AC; --parchment-dim:#B8A47E;
+  --p1:#D6C097; --p2:#C4AA7B; --p3:#AE9362;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+#table, #table{height:100%}
+#table{
+  --back:url(assets/back.webp);
+  background:radial-gradient(96% 44% at 50% 34%,#2E5540,#16291F 54%,#0B140F);
+  color:var(--parchment);font-family:"Gowun Dodum",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;overflow:hidden;
+}
+#table button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+#table :focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
+#table .screen{height:100%;display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 10px)}
+
+#table .bar{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+#table .bar__x{font-size:19px;line-height:1;color:#8FA898;padding:2px 6px}
+#table .bar__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:13.5px;color:#CFE0D4}
+#table .bar__s{font-size:11.5px;color:#8FA898}
+#table .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+#table .lang button{padding:3px 7px;font-size:10px;letter-spacing:.06em;color:var(--parchment-dim)}
+#table .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
+
+#table /* 바닥 펼치기 */
+.spread{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(266px,74vw);max-height:min(288px,40vh);overflow-y:auto;
+  display:flex;flex-direction:column;gap:7px;align-items:stretch;
+  padding:12px 11px;border-radius:6px;
+  background:rgba(8,16,11,.86);border:1px solid rgba(198,154,60,.4);
+  box-shadow:0 12px 30px rgba(0,0,0,.6)}
+#table .srow{display:flex;align-items:center;gap:8px}
+#table .srow__w{font-size:10px;color:#9FB6A5;width:34px;flex:none;text-align:right;white-space:nowrap}
+#table .srow__c{display:flex;gap:3px;align-items:center}
+#table .srow__p{font-size:10px;color:#9FB6A5;padding-left:3px}
+#table .srow--new .srow__w{color:var(--gold-hi)}
+#table .srow--new .srow__c{outline:1px solid rgba(227,198,124,.5);outline-offset:3px;border-radius:3px}
+#table .spread__t{font-size:10.5px;color:#7E9686;text-align:center;padding-top:2px}
+#table .play, #table .pile__hint{cursor:pointer}
+
+#table /* ---------- ring ---------- */
+.ring{flex:1;min-height:0;position:relative;margin-top:4px}
+#table .stage{position:absolute;inset:0}
+#table .plane{position:absolute;left:0;right:0;top:19%;bottom:13%;transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.3,.7,.3,1)}
+#table .felt{
+  position:absolute;left:2%;right:2%;top:2%;bottom:2%;border-radius:50%;
+  background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
+  box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4);
+}
+#table .felt::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:repeating-linear-gradient(51deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px)}
+
+#table .seat{position:absolute;width:76px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6;
+  transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
+#table .seat{transform:translate(-50%,-50%)}
+#table .seat__av{width:44px;height:44px;border-radius:50%;object-fit:cover;
+  border:2px solid rgba(198,154,60,.6);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6)}
+#table .seat--turn .seat__av{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(227,198,124,.3),0 3px 9px rgba(0,0,0,.6)}
+#table .seat--pass .seat__av, #table .seat--pass .seat__n{opacity:.36}
+#table .seat--out .seat__av{border-style:dashed;filter:grayscale(1) brightness(.7)}
+#table .seat--me .seat__av{border-color:#E3C67C;width:48px;height:48px}
+#table .seat__n{font-size:10.5px;text-shadow:0 1px 3px rgba(0,0,0,.9);line-height:1.2;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis}
+#table .seat__c{font-size:9.5px;color:#CFE0D4;text-shadow:0 1px 3px rgba(0,0,0,.9);white-space:nowrap}
+#table .seat__c b{font-family:"Noto Serif KR",serif;font-weight:900;color:var(--gold-hi)}
+#table .fan{position:relative;height:22px;margin-top:1px}
+#table .fan i{
+  position:absolute;top:0;width:13px;height:22px;border-radius:2px;
+  background-image:var(--back);background-size:cover;background-position:center;
+  border:.5px solid rgba(198,154,60,.55);
+  box-shadow:-1px 1px 3px rgba(0,0,0,.6);
+}
+#table .seat__tag{position:absolute;top:-7px;left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:.08em;padding:1px 6px;border-radius:2px;
+  background:rgba(10,16,12,.92);border:1px solid var(--gold-dim);color:var(--gold-hi);white-space:nowrap}
+
+#table /* ---------- pile in the middle ---------- */
+.pile{position:absolute;left:50%;top:50%;width:0;height:0;z-index:4;transform-style:preserve-3d}
+#table #seats{position:absolute;inset:0;transform-style:preserve-3d}
+#table .play{position:absolute;left:0;top:0;display:flex;gap:4px;transform-style:preserve-3d;
+  transform:translate(-50%,calc(-50% + var(--dy,0px))) rotate(var(--r,0deg)) scale(var(--sc,1))}
+#table .play--new{animation:toss .34s cubic-bezier(.2,.8,.3,1) both}
+@keyframes toss{
+  from{transform:translate(calc(-50% + var(--fx,0px)),calc(-50% + var(--fy,0px))) rotate(0deg) scale(.72);opacity:.2}
+}
+#table .play--old{filter:brightness(.5) saturate(.7)}
+
+#table .pile__hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);backface-visibility:hidden;
+  width:150px;text-align:center;font-size:12px;color:#83A08D;line-height:1.7;
+  border:1px dashed rgba(198,154,60,.3);border-radius:5px;padding:16px 10px}
+
+#table /* ---------- card ---------- */
+.card{--w:58px;width:var(--w);aspect-ratio:200/390;flex:none;
+  border-radius:calc(var(--w) * .05);padding:calc(var(--w) * .042);
+  background:
+    radial-gradient(38% 22% at 16% 12%,rgba(140,106,52,.16),transparent 70%),
+    radial-gradient(44% 24% at 70% 92%,rgba(112,82,38,.18),transparent 74%),
+    linear-gradient(162deg,var(--p1),var(--p2) 52%,var(--p3));
+  box-shadow:inset 0 0 calc(var(--w) * .09) rgba(108,78,34,.34),0 4px 10px rgba(0,0,0,.6);
+  display:flex;flex-direction:column}
+#table .card__band{display:flex;align-items:center;justify-content:space-between;
+  padding:0 calc(var(--w) * .016);height:calc(var(--w) * .208);color:var(--card-ink)}
+#table .card__num{font-family:"Noto Serif KR",serif;font-weight:900;font-size:calc(var(--w) * .152);
+  line-height:1;min-width:calc(var(--w) * .145);text-align:center}
+#table .card__name{font-family:"Noto Serif KR",serif;font-weight:700;font-size:calc(var(--w) * .086);
+  white-space:nowrap;color:var(--card-ink-2)}
+#table .card.is-joker .card__band{justify-content:space-between}
+#table .card__num.as{color:#8A6A1E}
+#table .card.is-joker .card__name{font-size:calc(var(--w) * .072)}
+#table .card__art{flex:1;min-height:0;border:calc(var(--w) * .011) solid var(--gold-dim);
+  background:#1A1410;overflow:hidden}
+#table .card__art img{width:100%;height:100%;object-fit:cover;display:block}
+
+#table /* ---------- hand ---------- */
+.need{text-align:center;font-size:11.5px;color:#A9C0B0;margin:2px 0 5px;min-height:16px}
+#table .need b{color:var(--gold-hi);font-weight:400}
+#table .timer{height:3px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:8px}
+#table .timer i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-hi),var(--gold));
+  transform-origin:left;animation:tick 15s linear forwards}
+@keyframes tick{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+#table .hand{position:relative;height:126px;margin-bottom:9px}
+#table .hand .slot{position:absolute;bottom:0;transition:transform .16s ease}
+#table .hand .card{--w:60px}
+#table .hand .card__name{display:none}
+#table .slot--sel{transform:translateY(-20px)}
+#table .slot--sel .card{box-shadow:0 0 0 2px var(--gold-hi),0 10px 18px rgba(0,0,0,.6)}
+#table .slot--dead .card{filter:brightness(.44) saturate(.5)}
+#table .acts{display:flex;gap:9px}
+#table .acts button{flex:1;padding:14px;border-radius:2px;
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.05em}
+#table .bt-pass{border:1px solid var(--gold-dim);color:var(--parchment-dim)}
+#table .bt-play{background:linear-gradient(180deg,#7A2226,#4A1418);border:1px solid var(--gold);
+  box-shadow:0 1px 0 rgba(227,198,124,.24) inset,0 5px 14px rgba(0,0,0,.5)}
+#table .acts button:disabled{opacity:.36;box-shadow:none}
+
+</style>
+</head>
+<body data-lang="ko">
+
+<section class="page is-on" id="entry">
+<div class="bg">
+  <div class="bg__img"></div>
+  <div class="bg__top"></div>
+  <div class="bg__bot"></div>
+  <div class="motes" id="motes"></div>
+</div>
+
+<div class="lang" id="lang">
+  <button data-l="ko" aria-pressed="true">한국어</button>
+  <button data-l="en" aria-pressed="false">EN</button>
+</div>
+
+<div class="fan"><div class="fan__in" id="fan"></div></div>
+
+<main class="screen">
+  <div class="plate">
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 class="wordmark" id="wordmark"></h1>
+    <p class="sub" id="sub"></p>
+    <div class="hr"></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" id="start"></button>
+</main>
+</section>
+
+<section class="page" id="lobby">
+
+<main class="screen">
+  <div class="bar"><button class="navback" data-back="entry" aria-label="뒤로">‹</button>
+    <div class="mark" id="mark"></div>
+    <div class="lang" id="lang">
+      <button data-l="ko" aria-pressed="true">한국어</button>
+      <button data-l="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <div class="body">
+    <div>
+      <div class="block__label" id="lbQuick"></div>
+      <button class="btn-primary" id="btQuick"></button>
+      <p class="hint" id="hQuick"></p>
+    </div>
+
+    <div>
+      <div class="block__label" id="lbNew"></div>
+      <button class="btn-second" id="btNew"></button>
+      <p class="hint" id="hNew"></p>
+    </div>
+
+    <div>
+      <div class="block__label" id="lbJoin"></div>
+      <div class="join">
+        <input id="code" inputmode="numeric" maxlength="4" placeholder="0000" aria-label="방 번호">
+        <button id="btJoin"></button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-rules" id="btRules"></button>
+</main>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet__veil" data-close></div>
+  <div class="sheet__panel">
+    <div class="sheet__head">
+      <div class="sheet__title" id="shTitle"></div>
+      <button class="sheet__close" data-close aria-label="닫기">×</button>
+    </div>
+    <div class="sheet__body">
+      <p class="lead" id="shLead"></p>
+      <div class="grid" id="grid"></div>
+      <div id="rules"></div>
+    </div>
+  </div>
+</div>
+
+</section>
+<section class="page" id="draw">
+
+<main class="screen">
+  <div class="bar">
+    <div style="display:flex;align-items:center;gap:6px"><button class="navback" data-back="room" aria-label="뒤로">‹</button><div class="bar__t" id="step"></div></div>
+    <div class="lang" id="lang">
+      <button data-l="ko" aria-pressed="true">한</button>
+      <button data-l="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+  <div class="ring" id="ring">
+    <div class="plane" id="plane">
+      <div class="felt"></div>
+      <div id="seats"></div>
+      <div class="deck" id="deck"></div>
+    </div>
+  </div>
+
+  <div class="mid" id="mid"></div>
+  <div class="pad"></div>
+  <div class="acts">
+    <button class="bt-main" id="go" disabled></button>
+  </div>
+</main>
+
+</section>
+<section class="page" id="room">
+
+<main class="screen">
+  <div class="bar">
+    <button class="back" data-back="lobby" aria-label="나가기">‹</button>
+    <div class="bar__t" id="bt"></div>
+    <div style="display:flex;gap:7px">
+      <div class="view" id="lang">
+        <button data-l="ko" aria-pressed="true">한</button>
+        <button data-l="en" aria-pressed="false">EN</button>
+      </div>
+      <div class="view" id="view">
+        <button data-v="host" aria-pressed="true">방장</button>
+        <button data-v="guest" aria-pressed="false">참가자</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="roomno">
+    <div>
+      <div class="roomno__l" id="rl"></div>
+      <div class="roomno__n">4 7 2 9</div>
+    </div>
+    <button id="rc"></button>
+  </div>
+
+  <div class="tablewrap">
+    <div class="felt">
+      <div class="felt__c">
+        <div class="felt__n" id="feltN"></div>
+        <div class="felt__s" id="feltS"></div>
+      </div>
+    </div>
+    <div id="seats"></div>
+  </div>
+
+  <div id="controls"></div>
+  <div id="action"></div>
+</main>
+
+</section>
+<section class="page" id="tax">
+
+<main class="screen">
+  <div class="bar">
+    <div style="display:flex;align-items:center;gap:6px"><button class="navback" data-back="room" aria-label="뒤로">‹</button><div class="bar__t" id="step"></div></div>
+    <div style="display:flex;gap:6px">
+      <div class="pick" id="scn">
+        <button data-s="0" aria-pressed="true">1등</button>
+        <button data-s="1" aria-pressed="false">꼴등</button>
+        <button data-s="2" aria-pressed="false">소혁명</button>
+        <button data-s="3" aria-pressed="false">대혁명</button>
+      </div>
+      <div class="lang" id="lang">
+        <button data-l="ko" aria-pressed="true">한</button>
+        <button data-l="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ring">
+    <div class="plane">
+      <div class="felt"></div>
+      <div id="seats"></div>
+      <div class="fx" id="fx"></div>
+      <div class="flash" id="flash"></div>
+      <div class="mid" id="mid"></div>
+    </div>
+  </div>
+
+  <div class="hint" id="hint"></div>
+  <div class="hand" id="hand"></div>
+  <div class="acts">
+    <button class="bt-ghost" id="back"></button>
+    <button class="bt-main" id="next"></button>
+  </div>
+</main>
+
+</section>
+<section class="page" id="table">
+
+<main class="screen">
+  <div class="bar">
+    <div style="display:flex;align-items:center;gap:9px"><button class="bar__x" data-back="lobby" aria-label="나가기">✕</button><button id="endRound" style="font-size:10.5px;letter-spacing:.04em;color:#8FA898;border:1px solid #2E4436;border-radius:2px;padding:4px 8px;background:none;cursor:pointer">판 종료</button></div>
+    <div class="bar__r" id="round"></div>
+    <div style="display:flex;align-items:center;gap:9px">
+      <div class="lang" id="lang">
+        <button data-l="ko" aria-pressed="true">한</button>
+        <button data-l="en" aria-pressed="false">EN</button>
+      </div>
+      <div class="bar__s" id="phase">내 차례</div>
+    </div>
+  </div>
+
+  <div class="ring" id="ring">
+    <div class="stage"><div class="plane">
+      <div class="felt"></div>
+      <div class="pile" id="pile"></div>
+      <div id="seats"></div>
+    </div></div>
+  </div>
+
+  <div class="need" id="need"></div>
+  <div class="timer" id="timer"><i></i></div>
+  <div class="hand" id="hand"></div>
+  <div class="acts">
+    <button class="bt-pass" id="pass">패스</button>
+    <button class="bt-play" id="play" disabled>카드를 고르세요</button>
+  </div>
+</main>
+
+<div id="flash" style="position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);
+  padding:12px 22px;border:1px solid var(--gold);border-radius:3px;background:rgba(10,18,13,.94);
+  font-family:'Gowun Batang',serif;font-weight:700;font-size:16px;opacity:0;pointer-events:none;
+  transition:opacity .2s ease;z-index:50"></div>
+
+</section>
+
+<script>
+const IMG = {"02": "assets/hero_02.webp", "04": "assets/hero_04.webp", "05": "assets/hero_05.webp", "10": "assets/hero_10.webp", "joker_a": "assets/hero_joker_a.webp"};
+/* 배경에 사자 왕이 있어서 부채꼴에서는 사자를 뺐다 */
+const FAN = [
+  {key:"10", num:"10", ko:"토끼",   en:"RABBIT"},
+  {key:"joker_a", joker:true, ko:"카멜레온", en:"CHAMELEON"},
+  {key:"02", num:"2",  ko:"호랑이", en:"TIGER"},
+  {key:"05", num:"5",  ko:"악어",   en:"CROCODILE"},
+  {key:"04", num:"4",  ko:"코끼리", en:"ELEPHANT"}
+];
+const T = {
+  ko:{eyebrow:"ZOO PRESIDENT", wordmark:"동물의 왕국", sub:"계급 카드게임", start:"게임 시작"},
+  en:{eyebrow:"CARD CLASH", wordmark:"Zoo President", sub:"Climbing card game", start:"Start game"}
+};
+let lang = "ko";
+
+const fan = document.getElementById("fan");
+function renderFan(){
+  fan.innerHTML = "";
+  FAN.forEach((c, i) => {
+    const d = document.createElement("div");
+    d.className = "card" + (c.joker ? " is-joker" : "");
+    d.dataset.i = i;
+    d.innerHTML = c.joker
+      ? '<div class="card__band"><span class="card__name">' + c[lang] + '</span></div>' +
+        '<div class="card__art"><img src="' + IMG[c.key] + '" alt=""></div>' +
+        '<div class="card__band"><span class="card__mark">JOKER</span></div>'
+      : '<div class="card__band">' +
+          '<span class="card__num">' + c.num + '</span>' +
+          '<span class="card__name">' + c[lang] + '</span>' +
+          '<span class="card__num">' + c.num + '</span>' +
+        '</div>' +
+        '<div class="card__art"><img src="' + IMG[c.key] + '" alt=""></div>' +
+        '<div class="card__band">' +
+          '<span class="card__num">' + c.num + '</span>' +
+          '<span class="card__num">' + c.num + '</span>' +
+        '</div>';
+    fan.appendChild(d);
+  });
+}
+
+function apply(){
+  const t = T[lang];
+  document.body.dataset.lang = lang;
+  document.documentElement.lang = lang;
+  document.getElementById("eyebrow").textContent = t.eyebrow;
+  document.getElementById("wordmark").textContent = t.wordmark;
+  document.getElementById("sub").textContent = t.sub;
+  document.getElementById("start").textContent = t.start;
+  renderFan();
+}
+apply();
+
+const motes = document.getElementById("motes");
+for (let i = 0; i < 22; i++){
+  const s = document.createElement("span");
+  s.className = "mote";
+  const size = 2 + Math.random() * 4;
+  s.style.cssText =
+    "left:" + (Math.random() * 100).toFixed(1) + "%;top:" + (76 + Math.random() * 30).toFixed(1) + "%;" +
+    "width:" + size.toFixed(1) + "px;height:" + size.toFixed(1) + "px;" +
+    "animation-duration:" + (13 + Math.random() * 14).toFixed(1) + "s;" +
+    "animation-delay:-" + (Math.random() * 24).toFixed(1) + "s";
+  motes.appendChild(s);
+}
+
+document.querySelectorAll("#lang button").forEach(b => {
+  b.addEventListener("click", () => {
+    lang = b.dataset.l;
+    document.querySelectorAll("#lang button").forEach(x =>
+      x.setAttribute("aria-pressed", String(x === b)));
+    apply();
+  });
+});
+</script>
+
+<script>
+(function(){
+const __r = window.document.getElementById("lobby");
+const document = {
+  getElementById: id => __r.querySelector('[id="' + id + '"]'),
+  querySelector: s => __r.querySelector(s),
+  querySelectorAll: s => __r.querySelectorAll(s),
+  createElement: t => window.document.createElement(t),
+  get body(){ return window.document.body },
+  get documentElement(){ return window.document.documentElement },
+  addEventListener: (...a) => window.document.addEventListener(...a)
+};
+
+const IMG = {"01": "assets/card_01.webp", "02": "assets/card_02.webp", "03": "assets/card_03.webp", "04": "assets/card_04.webp", "05": "assets/card_05.webp", "06": "assets/card_06.webp", "07": "assets/card_07.webp", "08": "assets/card_08.webp", "09": "assets/card_09.webp", "10": "assets/card_10.webp", "11": "assets/card_11.webp", "12": "assets/card_12.webp", "joker": "assets/joker_a.webp"};
+
+const T = {
+  ko:{
+    mark:"동물의 왕국",
+    lbQuick:"바로 시작하기", btQuick:"빠른 참가",
+    hQuick:"기다리는 분들과 자동으로 이어 드립니다. 인원이 모이면 바로 시작합니다.",
+    lbNew:"친구와 하기", btNew:"방 만들기",
+    hNew:"방을 만들면 4자리 번호가 나옵니다. 친구에게 번호를 알려 주세요. 4명부터 8명까지 함께할 수 있습니다.",
+    lbJoin:"번호로 들어가기", btJoin:"참가",
+    rules:"규칙 보기", shTitle:"규칙",
+    shLead:"손에 든 카드를 <b>먼저 다 털어내면</b> 이깁니다. 핵심은 하나입니다 — <b>숫자가 낮을수록 높은 계급</b>이고, 덱에 든 장수도 그만큼 적습니다.",
+    names:["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"],
+    count:function(n){return n + "장"},
+    items:[
+      ["내는 법","앞사람이 낸 것과 <b>같은 장수</b>로, <b>더 낮은 숫자</b>만 낼 수 있습니다. 8번 세 장 위에는 7번 이하 세 장을 냅니다."],
+      ["패스","언제든 넘길 수 있고 다음 차례에 다시 낼 수 있습니다. 전원이 넘기면 바닥을 치우고 마지막에 낸 분이 새로 시작합니다."],
+      ["세금","판이 끝나면 등수가 다음 판의 계급이 됩니다. 1등은 꼴등의 가장 좋은 카드 두 장을 가져가고 아무 카드나 두 장을 줍니다. 2등은 뒤에서 두 번째와 한 장씩 바꿉니다."],
+      ["혁명","카멜레온 두 장을 모두 쥐면 그 판의 세금이 취소됩니다. 그분이 꼴등이면 대혁명이 되어 계급이 통째로 뒤집힙니다."],
+      ["점수와 승리","한 판이 끝나면 1등 100점, 2등 90점처럼 등수마다 10점씩 낮게 받습니다. 방장이 정한 판 수를 다 치르고 총점이 가장 높은 분이 우승합니다. 세금과 혁명은 방에서 끌 수 있습니다."]
+    ],
+    joker:["카멜레온","다른 카드와 같이 내면 그 카드로 변합니다. 5번 두 장에 카멜레온을 얹으면 5번 세 장이 됩니다. 혼자 내면 13번으로 취급되어 가장 약합니다. 덱에 두 장 있습니다."]
+  },
+  en:{
+    mark:"Zoo President",
+    lbQuick:"PLAY NOW", btQuick:"Quick match",
+    hQuick:"We'll pair you with players already waiting. The game starts as soon as the table fills.",
+    lbNew:"PLAY WITH FRIENDS", btNew:"Create room",
+    hNew:"You'll get a 4-digit number. Share it with your friends. 4 to 8 players.",
+    lbJoin:"JOIN BY NUMBER", btJoin:"Join",
+    rules:"How to play", shTitle:"How to play",
+    shLead:"<b>Empty your hand first</b> to win. One thing drives everything — a <b>lower number means higher rank</b>, and fewer of them exist in the deck.",
+    names:["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"],
+    count:function(n){return n + (n === 1 ? " card" : " cards")},
+    items:[
+      ["Playing","Match the <b>same count</b> as the player before you, at a <b>lower number</b>. Three 8s can only be beaten by three cards of 7 or lower."],
+      ["Passing","Pass any time and rejoin on your next turn. When everyone passes, the pile clears and whoever played last leads again."],
+      ["Tax","Finishing order sets rank for the next round. First takes the last player's two best cards and hands back any two. Second swaps one card with the second-to-last."],
+      ["Revolution","Hold both chameleons and tax is cancelled for that round. If the last-place player holds them, ranks reverse entirely."],
+      ["Score and winning","Each round pays 100 for first, 90 for second, and ten less per place. After the host's chosen number of rounds, the highest total wins. Tax and revolution can be switched off in the room."]
+    ],
+    joker:["Chameleon","Played alongside other cards it becomes that card — two 5s plus a chameleon makes three 5s. Played alone it counts as 13, the weakest card. Two are in the deck."]
+  }
+};
+let lang = "ko";
+
+function miniCard(key, num, name){
+  return '<div class="card">' +
+    '<div class="card__band">' +
+      '<span class="card__num">' + num + '</span>' +
+      '<span class="card__name">' + name + '</span>' +
+      '<span class="card__num">' + num + '</span>' +
+    '</div>' +
+    '<div class="card__art"><img src="' + IMG[key] + '" alt=""></div>' +
+    '<div class="card__band"><span class="card__num">' + num + '</span><span class="card__num">' + num + '</span></div>' +
+  '</div>';
+}
+
+function render(){
+  const t = T[lang];
+  document.body.dataset.lang = lang;
+  document.documentElement.lang = lang;
+  const set = (id, v) => document.getElementById(id).textContent = v;
+  set("mark", t.mark);
+  set("lbQuick", t.lbQuick); set("btQuick", t.btQuick); set("hQuick", t.hQuick);
+  set("lbNew", t.lbNew); set("btNew", t.btNew); set("hNew", t.hNew);
+  set("lbJoin", t.lbJoin); set("btJoin", t.btJoin);
+  set("btRules", t.rules); set("shTitle", t.shTitle);
+  document.getElementById("shLead").innerHTML = t.shLead;
+
+  document.getElementById("grid").innerHTML = t.names.map((name, i) => {
+    const n = i + 1;
+    const key = String(n).padStart(2, "0");
+    return '<div class="cell">' + miniCard(key, n, name) +
+      '<span class="cell__c">' + t.count(n) + '</span></div>';
+  }).join("");
+
+  const jk = '<div class="rule rule--joker">' +
+    '<div class="jk">' +
+      '<div class="card"><div class="card__band" style="justify-content:center">' +
+      '<span class="card__name">' + t.joker[0] + '</span></div>' +
+      '<div class="card__art"><img src="' + IMG.joker + '" alt=""></div>' +
+      '<div class="card__band"></div></div>' +
+    '</div>' +
+    '<div><h3>' + t.joker[0] + '</h3><p>' + t.joker[1] + '</p></div></div>';
+
+  document.getElementById("rules").innerHTML =
+    jk + t.items.map(it => '<div class="rule"><h3>' + it[0] + '</h3><p>' + it[1] + '</p></div>').join("");
+}
+render();
+
+document.querySelectorAll("#lang button").forEach(b => {
+  b.addEventListener("click", () => {
+    lang = b.dataset.l;
+    document.querySelectorAll("#lang button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    render();
+  });
+});
+
+const sheet = document.getElementById("sheet");
+document.getElementById("btRules").addEventListener("click", () => sheet.classList.add("is-open"));
+sheet.querySelectorAll("[data-close]").forEach(el =>
+  el.addEventListener("click", () => sheet.classList.remove("is-open")));
+
+document.getElementById("code").addEventListener("input", e => {
+  e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4);
+});
+
+})();
+(function(){
+const __r = window.document.getElementById("draw");
+const document = {
+  getElementById: id => __r.querySelector('[id="' + id + '"]'),
+  querySelector: s => __r.querySelector(s),
+  querySelectorAll: s => __r.querySelectorAll(s),
+  createElement: t => window.document.createElement(t),
+  get body(){ return window.document.body },
+  get documentElement(){ return window.document.documentElement },
+  addEventListener: (...a) => window.document.addEventListener(...a)
+};
+
+const ART = {"01": "assets/card_01.webp", "02": "assets/card_02.webp", "03": "assets/card_03.webp", "04": "assets/card_04.webp", "05": "assets/card_05.webp", "06": "assets/card_06.webp", "07": "assets/card_07.webp", "08": "assets/card_08.webp", "09": "assets/card_09.webp", "10": "assets/card_10.webp", "11": "assets/card_11.webp", "12": "assets/card_12.webp", "jokerA": "assets/joker_a.webp", "jokerB": "assets/joker_b.webp", "back": "assets/back.webp"}, HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.webp", "assets/head_10.webp", "assets/head_06.webp", "assets/head_09.webp", "assets/head_07.webp", "assets/head_12.webp"];
+const el = id => document.getElementById(id);
+const isJ = c => c >= 13;
+const KO_N = ["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"];
+const EN_N = ["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"];
+const NAMES_KO = ["나","민지","준호","서연","태윤","하은","지훈","예린"];
+const NAMES_EN = ["You","Minji","Junho","Seoyeon","Taeyun","Haeun","Jihoon","Yerin"];
+
+const T = {
+  ko:{ step:"첫 계급 정하기",
+       h:"카드를 한 장 뽑으세요",
+       s:"숫자가 가장 낮은 분이 먼저 시작합니다. 차례는 거기서 시계 방향으로 돕니다. 카멜레온은 13으로 칩니다.",
+       waitH:"뽑는 중",
+       waitS:n=>'<b>'+n+'</b>님이 고르고 있습니다.', settling:"뽑은 카드를 맞춰 보는 중입니다.",
+       doneH:"순서가 정해졌습니다", first:"선",
+       doneS:n=>'<b>'+n+'</b>님이 먼저 시작합니다. 차례는 여기서 시계 방향입니다.',
+       note:"첫 판은 계급도 세금도 없습니다.",
+       go:"판 시작", picking:"고르는 중" },
+  en:{ step:"Opening draw",
+       h:"Draw one card",
+       s:"The lowest number leads. Turn order runs clockwise from that seat. A chameleon counts as 13.",
+       waitH:"Drawing",
+       waitS:n=>'<b>'+n+'</b> is choosing.', settling:"Comparing the draws.",
+       doneH:"Turn order is set", first:"LEAD",
+       doneS:n=>'<b>'+n+'</b> leads. Turns run clockwise from there.',
+       note:"The first round has no ranks and no tax.",
+       go:"Start round", picking:"Choosing" }
+};
+let lang = "ko";
+let N = 6;
+const nameOf = i => (lang === "ko" ? NAMES_KO : NAMES_EN)[i];
+const art = n => n === 13 ? ART.jokerA : n === 14 ? ART.jokerB : ART[String(n).padStart(2,"0")];
+const val = c => isJ(c) ? 13 : c;
+
+let drawn = Array(N).fill(null);   // 자리별로 뽑은 카드
+let pool = [];                     // 바닥에 깔린 카드
+let waiting = [];                  // 아직 안 뽑은 자리 (순서대로)
+let phase = "pick";                // pick | tie | done
+
+function seatPos(i){
+  const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
+  return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
+}
+function cardFace(c){
+  const n = isJ(c) ? 13 : c;
+  return '<div class="card">' +
+    '<div class="card__band"><span class="card__num">' + n + '</span>' +
+    '<span class="card__num">' + n + '</span></div>' +
+    '<div class="card__art"><img src="' + art(c) + '" alt=""></div>' +
+    '<div class="card__band"><span class="card__num">' + n + '</span>' +
+    '<span class="card__num">' + n + '</span></div></div>';
+}
+function makeDeck(){
+  const d = [];
+  for (let n = 1; n <= 12; n++) for (let i = 0; i < n; i++) d.push(n);
+  d.push(13, 14);
+  for (let i = d.length - 1; i > 0; i--){
+    const k = Math.floor(Math.random() * (i + 1));
+    [d[i], d[k]] = [d[k], d[i]];
+  }
+  return d;
+}
+
+/* 가장 낮은 숫자를 뽑은 사람이 1등. 나머지는 그 자리에서 시계 방향으로 */
+let pickOrder = [];              // 뽑은 순서 (동점이면 먼저 뽑은 쪽이 위)
+function winner(){
+  let best = null;
+  pickOrder.forEach(i => {
+    if (drawn[i] == null) return;
+    if (best === null || val(drawn[i]) < val(drawn[best])) best = i;
+  });
+  return best === null ? 0 : best;
+}
+function ranking(){
+  const w = winner();
+  return Array.from({length: N}, (_, k) => ({i: (w + k) % N}));
+}
+
+function layout(players){
+  const d = makeDeck();
+  pool = d.slice(0, players.length);
+  waiting = players.slice();
+  const deck = el("deck");
+  deck.innerHTML = "";
+  const n = pool.length;
+  const cols = n <= 4 ? n : Math.min(4, Math.ceil(n / 2));
+  const avail = (el("ring").clientWidth || 360) - 48;
+  const pw = Math.max(26, Math.min(34, Math.floor((avail - (cols - 1) * 9) / cols)));
+  deck.style.setProperty("--cols", cols);
+  deck.style.setProperty("--pw", pw + "px");
+  pool.forEach((c, k) => {
+    const w = document.createElement("div");
+    w.className = "pk";
+    w.dataset.k = k;
+    w.innerHTML = '<div class="pk__in">' +
+      '<div class="pk__f pk__f--b"><img src="' + ART.back + '" alt=""></div>' +
+      '<div class="pk__f pk__f--a">' + cardFace(c) + '</div></div>';
+    w.onclick = () => { if (waiting[0] === 0) pick(0, k); };
+    deck.appendChild(w);
+  });
+}
+
+function pick(seat, k){
+  const w = el("deck").querySelector('.pk[data-k="' + k + '"]:not(.taken)');
+  if (!w) return;
+  drawn[seat] = pool[k];
+  pickOrder.push(seat);
+  waiting = waiting.filter(x => x !== seat);
+  w.classList.add("flip", "taken");
+  w.dataset.seat = seat;
+  draw();
+  if (waiting.length) setTimeout(botPick, 900);
+  else setTimeout(settle, 1200);
+}
+
+function botPick(){
+  const seat = waiting[0];
+  const free = pool.map((_, k) => k).filter(k =>
+    el("deck").querySelector('.pk[data-k="' + k + '"]:not(.taken)'));
+  pick(seat, free[Math.floor(Math.random() * free.length)]);
+}
+
+function settle(){ phase = "done"; draw(); }
+
+function renderSeats(){
+  const box = el("seats"); box.innerHTML = "";
+  const order = phase === "done" ? ranking().map(x => x.i) : [];
+  for (let i = 0; i < N; i++){
+    const p = seatPos(i);
+    const d = document.createElement("div");
+    const r = order.indexOf(i);
+    d.className = "seat" + (i === 0 ? " seat--me" : "") +
+      (waiting[0] === i && phase === "pick" ? " seat--turn" : "") +
+      "";
+    d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    const first = phase === "done" && i === winner();
+    const dv = drawn[i] == null ? "" : val(drawn[i]);
+    d.innerHTML =
+      '<span class="seat__r' + (first ? " on" : "") + '">' + T[lang].first + '</span>' +
+      '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
+      '<span class="seat__n">' + nameOf(i) + '</span>' +
+      (dv === "" ? "" : '<span class="seat__d">' + dv + '</span>');
+    box.appendChild(d);
+  }
+}
+
+function draw(){
+  const t = T[lang];
+  el("step").textContent = t.step;
+  renderSeats();
+  const m = el("mid");
+  if (phase === "done"){
+    m.innerHTML = '<div class="mid__h">' + t.doneH + '</div><div class="mid__s">' +
+      t.doneS(nameOf(winner())) + '<br>' + t.note + '</div>';
+  } else if (!waiting.length){
+    m.innerHTML = '<div class="mid__h">' + t.waitH + '</div><div class="mid__s">' + t.settling + '</div>';
+  } else if (waiting[0] === 0){
+    m.innerHTML = '<div class="mid__h">' + t.h + '</div><div class="mid__s">' + t.s + '</div>';
+  } else {
+    m.innerHTML = '<div class="mid__h">' + t.waitH + '</div><div class="mid__s">' +
+      t.waitS(nameOf(waiting[0])) + '</div>';
+  }
+  const g = el("go");
+  g.textContent = phase === "done" ? t.go : t.picking;
+  g.disabled = phase !== "done";
+}
+
+function boot(){
+  N = (window.__opts && window.__opts.cap) || 6;
+  drawn = Array(N).fill(null);
+  pickOrder = [];
+  window.__roundNo = 1;
+  window.__myRank = null;
+  phase = "pick";
+  layout(Array.from({length: N}, (_, i) => i));
+  draw();
+}
+window.__bootDraw = boot;
+boot();
+
+document.querySelectorAll("#lang button").forEach(b => {
+  b.addEventListener("click", () => {
+    lang = b.dataset.l;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("#lang button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  });
+});
+window.addEventListener("resize", draw);
+
+})();
+(function(){
+const __r = window.document.getElementById("room");
+const document = {
+  getElementById: id => __r.querySelector('[id="' + id + '"]'),
+  querySelector: s => __r.querySelector(s),
+  querySelectorAll: s => __r.querySelectorAll(s),
+  createElement: t => window.document.createElement(t),
+  get body(){ return window.document.body },
+  get documentElement(){ return window.document.documentElement },
+  addEventListener: (...a) => window.document.addEventListener(...a)
+};
+
+const HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.webp", "assets/head_10.webp", "assets/head_06.webp", "assets/head_09.webp", "assets/head_07.webp", "assets/head_12.webp"];
+
+const PLAYERS_KO = ["나", "민지", "준호", "서연", "태윤", "하은", "지훈", "예린"];
+const PLAYERS_EN = ["You", "Minji", "Junho", "Seoyeon", "Taeyun", "Haeun", "Jihoon", "Yerin"];
+const L = {
+  ko:{ title:"방 대기실", roomL:"방 번호", copy:"번호 복사", host:"방장", guest:"참가자",
+       count:(j,c)=>j+" / "+c+"명",
+       needMore:"4명부터 시작할 수 있습니다",
+       canStart:"지금 시작하거나 더 기다리셔도 됩니다",
+       full:"자리가 다 찼습니다", empty:"빈 자리", hostTag:"방장",
+       capT:"방 인원", capD:"4명에서 8명까지 정할 수 있습니다.", capDG:"방장이 정합니다.",
+       rndT:"몇 판까지", rndD:"최소 3판입니다. 판 수가 끝나면 총점이 가장 높은 분이 우승합니다.",
+       rndDG:"방장이 정합니다.", rndU:n=>n+"판",
+       taxT:"세금과 혁명",
+       taxD:"등수에 따라 카드를 주고받고, 카멜레온 두 장으로 뒤집는 규칙입니다. 끄면 카드만으로 겨룹니다.",
+       clrT:"2번 카드로 판 엎기",
+       clrD:"2번을 내면 바닥을 비우고 다시 선을 잡습니다. 해외에서 익숙한 방식입니다.",
+       on:"켜져 있습니다.", off:"꺼져 있습니다.",
+       start:"시작하기", needFour:"4명이 모여야 시작합니다",
+       wait:"방장이 시작하기를 기다리는 중입니다" },
+  en:{ title:"Waiting room", roomL:"ROOM NUMBER", copy:"Copy", host:"Host", guest:"Guest",
+       count:(j,c)=>j+" of "+c,
+       needMore:"Four players are needed to start",
+       canStart:"Start now, or wait for more",
+       full:"The table is full", empty:"Open seat", hostTag:"HOST",
+       capT:"Table size", capD:"Anywhere from 4 to 8 players.", capDG:"The host decides.",
+       rndT:"Rounds", rndD:"Three at least. Highest total score after the last round wins.",
+       rndDG:"The host decides.", rndU:n=>n+"",
+       taxT:"Tax and revolution",
+       taxD:"Cards change hands by rank, and two chameleons overturn it. Turn it off for a plain card game.",
+       clrT:"Clear the pile with a 2",
+       clrD:"Playing a 2 clears the pile and you lead again. Familiar outside Korea.",
+       on:"On.", off:"Off.",
+       start:"Start", needFour:"Four players are needed",
+       wait:"Waiting for the host to start" }
+};
+let lang = "ko";
+const PLAYERS = PLAYERS_KO;
+let cap = 6;          // 방 인원
+let joined = 4;       // 들어온 사람
+let clear2 = false;   // 2번 판 엎기
+let rounds = 5;       // 몇 판까지
+let taxOn = true;     // 세금·혁명 사용
+let role = "host";
+
+function renderSeats(){
+  const box = document.getElementById("seats");
+  box.innerHTML = "";
+  for (let i = 0; i < cap; i++){
+    const a = (Math.PI / 2) + (i * 2 * Math.PI / cap);   // 아래에서 시계 방향
+    const left = 50 + Math.cos(a) * -40;
+    const top  = 50 + Math.sin(a) * 40;
+    const filled = i < joined;
+    const el = document.createElement("div");
+    el.className = "seat" + (filled ? "" : " seat--empty") + (i === 0 ? " seat--me" : "");
+    el.style.left = left.toFixed(2) + "%";
+    el.style.top  = top.toFixed(2) + "%";
+    el.innerHTML = filled
+      ? '<img class="seat__av" src="' + HEADS[i % HEADS.length] + '" alt="">' +
+        '<span class="seat__n">' + (lang === "ko" ? PLAYERS_KO : PLAYERS_EN)[i] + '</span>' +
+        (i === 0 && role === "host" ? '<span class="seat__b">' + L[lang].hostTag + '</span>' : '')
+      : '<div class="seat__av">+</div><span class="seat__n">' + L[lang].empty + '</span>';
+    box.appendChild(el);
+  }
+  const t = L[lang];
+  document.getElementById("bt").textContent = t.title;
+  document.getElementById("rl").textContent = t.roomL;
+  document.getElementById("rc").textContent = t.copy;
+  document.querySelector('#view [data-v="host"]').textContent = t.host;
+  document.querySelector('#view [data-v="guest"]').textContent = t.guest;
+  document.getElementById("feltN").textContent = t.count(joined, cap);
+  document.getElementById("feltS").textContent =
+    joined < 4 ? t.needMore : joined < cap ? t.canStart : t.full;
+}
+
+function renderControls(){
+  const c = document.getElementById("controls");
+  const a = document.getElementById("action");
+  const t = L[lang];
+  if (role === "host"){
+    c.innerHTML =
+      '<div class="opt">' +
+        '<div><div class="opt__t">' + t.capT + '</div>' +
+        '<div class="opt__d">' + t.capD + '</div></div>' +
+        '<div class="stepper">' +
+          '<button id="minus" ' + (cap <= 4 ? "disabled" : "") + ' aria-label="인원 줄이기">−</button>' +
+          '<span>' + cap + '</span>' +
+          '<button id="plus" ' + (cap >= 8 ? "disabled" : "") + ' aria-label="인원 늘리기">+</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="opt">' +
+        '<div><div class="opt__t">' + t.rndT + '</div>' +
+        '<div class="opt__d">' + t.rndD + '</div></div>' +
+        '<div class="stepper">' +
+          '<button id="rminus" ' + (rounds <= 3 ? "disabled" : "") + ' aria-label="판 수 줄이기">−</button>' +
+          '<span>' + t.rndU(rounds) + '</span>' +
+          '<button id="rplus" aria-label="판 수 늘리기">+</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="opt">' +
+        '<div><div class="opt__t">' + t.taxT + '</div>' +
+        '<div class="opt__d">' + t.taxD + '</div></div>' +
+        '<button class="sw" id="swTax" role="switch" aria-checked="' + taxOn + '" aria-label="' + t.taxT + '"></button>' +
+      '</div>' +
+      '<div class="opt">' +
+        '<div><div class="opt__t">' + t.clrT + '</div>' +
+        '<div class="opt__d">' + t.clrD + '</div></div>' +
+        '<button class="sw" id="sw" role="switch" aria-checked="' + clear2 + '" aria-label="' + t.clrT + '"></button>' +
+      '</div>';
+    a.innerHTML = '<button class="btn-primary" ' + (joined < 4 ? "disabled" : "") + '>' +
+      (joined < 4 ? t.needFour : t.start) + '</button>';
+    document.getElementById("minus").onclick = () => { if (cap > 4 && cap > joined) { cap--; draw(); } };
+    document.getElementById("plus").onclick  = () => { if (cap < 8) { cap++; draw(); } };
+    document.getElementById("sw").onclick    = () => { clear2 = !clear2; draw(); };
+    document.getElementById("rminus").onclick = () => { if (rounds > 3) { rounds--; draw(); } };
+    document.getElementById("rplus").onclick  = () => { rounds++; draw(); };
+    document.getElementById("swTax").onclick  = () => { taxOn = !taxOn; draw(); };
+  } else {
+    c.innerHTML =
+      '<div class="opt"><div><div class="opt__t">' + t.capT + '</div>' +
+      '<div class="opt__d">' + t.capDG + '</div></div>' +
+      '<div class="stepper"><span style="padding:0 12px">' + cap + '</span></div></div>' +
+      '<div class="opt"><div><div class="opt__t">' + t.rndT + '</div>' +
+      '<div class="opt__d">' + t.rndDG + '</div></div>' +
+      '<div class="stepper"><span style="padding:0 12px">' + t.rndU(rounds) + '</span></div></div>' +
+      '<div class="opt"><div><div class="opt__t">' + t.taxT + '</div>' +
+      '<div class="opt__d">' + (taxOn ? t.on : t.off) + '</div></div>' +
+      '<button class="sw" role="switch" aria-checked="' + taxOn + '" disabled></button></div>' +
+      '<div class="opt"><div><div class="opt__t">' + t.clrT + '</div>' +
+      '<div class="opt__d">' + (clear2 ? t.on : t.off) + '</div></div>' +
+      '<button class="sw" role="switch" aria-checked="' + clear2 + '" disabled></button></div>';
+    a.innerHTML = '<div class="waiting">' + t.wait + '<span class="dots"></span></div>';
+  }
+}
+
+function draw(){ renderSeats(); renderControls();
+  window.__opts = {rounds: rounds, tax: taxOn, clear2: clear2, cap: cap};
+}
+draw();
+
+document.querySelectorAll("#lang button").forEach(b => {
+  b.addEventListener("click", () => {
+    lang = b.dataset.l;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("#lang button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  });
+});
+
+document.querySelectorAll("#view button").forEach(b => {
+  b.addEventListener("click", () => {
+    role = b.dataset.v;
+    document.querySelectorAll("#view button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  });
+});
+
+/* 사람이 한 명씩 들어오는 모습 */
+setInterval(() => {
+  joined = joined < cap ? joined + 1 : 2;
+  draw();
+}, 3400);
+
+})();
+(function(){
+const __r = window.document.getElementById("tax");
+const document = {
+  getElementById: id => __r.querySelector('[id="' + id + '"]'),
+  querySelector: s => __r.querySelector(s),
+  querySelectorAll: s => __r.querySelectorAll(s),
+  createElement: t => window.document.createElement(t),
+  get body(){ return window.document.body },
+  get documentElement(){ return window.document.documentElement },
+  addEventListener: (...a) => window.document.addEventListener(...a)
+};
+
+const ART = {"01": "assets/card_01.webp", "02": "assets/card_02.webp", "03": "assets/card_03.webp", "04": "assets/card_04.webp", "05": "assets/card_05.webp", "06": "assets/card_06.webp", "07": "assets/card_07.webp", "08": "assets/card_08.webp", "09": "assets/card_09.webp", "10": "assets/card_10.webp", "11": "assets/card_11.webp", "12": "assets/card_12.webp", "jokerA": "assets/joker_a.webp", "jokerB": "assets/joker_b.webp"}, HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.webp", "assets/head_10.webp", "assets/head_06.webp", "assets/head_09.webp", "assets/head_07.webp", "assets/head_12.webp"];
+const el = id => document.getElementById(id);
+const isJ = c => c >= 13;
+
+const KO_N = ["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"];
+const EN_N = ["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"];
+const T = {
+  ko:{
+    steps:["계급 발표","패 나누기","혁명","세금","시작"],
+    dealH:"패 나누기", dealS:"80장을 골고루 나눕니다. 이 순간 카멜레온 두 장이 한 사람에게 몰리면 혁명이 열립니다.",
+    rankH:"이번 판의 계급", rankS:"손을 턴 순서가 그대로 계급이 됩니다. 위에서부터 사자·호랑이, 아래에서부터 생쥐·새 순입니다.",
+    revH:"혁명", revNone:"카멜레온 두 장을 모두 쥔 사람이 없습니다.",
+    revMine:"카멜레온 두 장이 모두 손에 들어왔습니다. 혁명을 선언하면 이번 판 세금이 사라집니다.",
+    revOther:n=>n+"님이 카멜레온 두 장을 쥐고 혁명을 선언했습니다. 이번 판 세금은 없습니다.",
+    revGreatMine:"꼴등인데 카멜레온 두 장을 모두 쥐었습니다. 대혁명을 선언하면 세금이 사라지고 계급이 통째로 뒤집힙니다.",
+    revGreatDone:"대혁명. 계급이 뒤집혔습니다.",
+    taxH:"세금", taxSkip:"혁명으로 이번 판 세금은 걷지 않습니다.",
+    taxMineTop:n=>'꼴등 <b>'+n+'</b>님의 가장 좋은 카드 두 장을 가져옵니다. 대신 아무 카드나 두 장을 주세요.',
+    taxMineTop2:n=>'뒤에서 두 번째 <b>'+n+'</b>님과 한 장씩 바꿉니다. 줄 카드 한 장을 고르세요.',
+    taxMineBot:n=>'1등 <b>'+n+'</b>님이 내 가장 좋은 카드 두 장을 가져갑니다.',
+    taxMineBot2:n=>'2등 <b>'+n+'</b>님이 내 가장 좋은 카드 한 장을 가져갑니다.',
+    taxMid:"1등과 2등만 세금을 주고받습니다. 나는 해당 없습니다.",
+    give:n=>n+"장 주기", giveNeed:n=>"줄 카드 "+n+"장을 고르세요",
+    take:"가져옴", gave:"줌",
+    doneH:"준비 완료", doneS:n=>'<b>'+n+'</b>님이 첫 판을 시작합니다.',
+    declare:"혁명 선언", declareG:"대혁명 선언", skip:"넘기기",
+    next:"다음", back:"처음부터", start:"판 시작",
+    joker:"카멜레온"
+  },
+  en:{
+    steps:["Ranks","Deal","Revolution","Tax","Start"],
+    dealH:"Dealing", dealS:"All 80 cards go out. If both chameleons land in one hand, a revolution opens up.",
+    rankH:"Ranks for this round", rankS:"Finishing order becomes rank — Lion and Tiger from the top, Mouse and Bird from the bottom.",
+    revH:"Revolution", revNone:"Nobody holds both chameleons.",
+    revMine:"Both chameleons are in your hand. Declare a revolution and this round's tax is cancelled.",
+    revOther:n=>n+" holds both chameleons and declared a revolution. No tax this round.",
+    revGreatMine:"You are last and hold both chameleons. A great revolution cancels tax and reverses every rank.",
+    revGreatDone:"Great revolution. Every rank is reversed.",
+    taxH:"Tax", taxSkip:"The revolution cancels tax for this round.",
+    taxMineTop:n=>'You take the two best cards from <b>'+n+'</b>, last place. Hand back any two.',
+    taxMineTop2:n=>'You swap one card with <b>'+n+'</b>, second from last. Pick one to give.',
+    taxMineBot:n=>'<b>'+n+'</b>, in first place, takes your two best cards.',
+    taxMineBot2:n=>'<b>'+n+'</b>, in second place, takes your best card.',
+    taxMid:"Only first and second trade. Nothing to do for you.",
+    give:n=>"Give "+n, giveNeed:n=>"Pick "+n+" to give",
+    take:"taken", gave:"given",
+    doneH:"Ready", doneS:n=>'<b>'+n+'</b> leads the first trick.',
+    declare:"Declare", declareG:"Declare great revolution", skip:"Skip",
+    next:"Next", back:"Restart", start:"Start round",
+    joker:"CHAMELEON"
+  }
+};
+let lang = "ko", scn = 0, step = 0, sel = [], declared = false, reversed = false;
+
+const NAMES = ["나","민지","준호","서연","태윤","하은","지훈","예린"];
+const EN_NAMES = ["You","Minji","Junho","Seoyeon","Taeyun","Haeun","Jihoon","Yerin"];
+const nameOf = i => (lang === "ko" ? NAMES : EN_NAMES)[i];
+
+/* 시나리오별 등수 (order[k] = k등인 자리 번호) */
+let N = 6;
+const seq = n => Array.from({length: n}, (_, i) => i);
+let SCN = [];
+function buildScn(){
+  const a = seq(N);                       // 내가 1등
+  const b = a.slice(1).concat([0]);       // 내가 꼴등
+  const c = [1, 0].concat(a.slice(2));    // 내가 2등
+  SCN = [
+    {order:a, hand:[1,3,3,6,8,9,11,12,12], rev:null},
+    {order:b, hand:[4,6,7,9,10,11,12,12,12], rev:null},
+    {order:c, hand:[2,5,6,8,9,10,11,12,12], rev:2},
+    {order:b, hand:[6,8,9,10,11,12,12,13,14], rev:0}
+  ];
+}
+buildScn();
+let hand = [];
+
+const art = n => n === 13 ? ART.jokerA : n === 14 ? ART.jokerB : ART[String(n).padStart(2,"0")];
+function cardHTML(n, w){
+  if (isJ(n)) return '<div class="card" style="--w:' + w + 'px">' +
+    '<div class="card__band"></div><div class="card__art"><img src="' + art(n) + '" alt=""></div>' +
+    '<div class="card__band"></div></div>';
+  return '<div class="card" style="--w:' + w + 'px">' +
+    '<div class="card__band"><span class="card__num">' + n + '</span>' +
+    '<span class="card__num">' + n + '</span></div>' +
+    '<div class="card__art"><img src="' + art(n) + '" alt=""></div>' +
+    '<div class="card__band"><span class="card__num">' + n + '</span>' +
+    '<span class="card__num">' + n + '</span></div></div>';
+}
+
+/* 등수 → 자리, 자리 → 등수 */
+function order(){ const o = SCN[scn].order.slice(); return reversed ? o.slice().reverse() : o; }
+function rankOf(seat){ return order().indexOf(seat); }
+/* 계급 호칭 = 덱 순서. 위에서부터 사자·호랑이·…, 아래에서부터 생쥐·새·… */
+function rankName(r){
+  const N = lang === "ko" ? KO_N : EN_N, n = order().length;
+  return r < n / 2 ? N[r] : N[11 - (n - 1 - r)];
+}
+function seatPos(i){
+  const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
+  return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
+}
+
+/* from/to: 자리 번호, -1이면 가운데 */
+function flyCard(from, to, card, delay, faceDown){
+  const a = from < 0 ? {x:50,y:50} : seatPos(from);
+  const b = to   < 0 ? {x:50,y:50} : seatPos(to);
+  const d = document.createElement("div");
+  d.className = "fly";
+  d.style.left = a.x + "%"; d.style.top = a.y + "%";
+  d.style.transform = "translate(-50%,-50%) scale(.7)";
+  d.style.opacity = 0;
+  d.innerHTML = faceDown ? backHTML(32) : cardHTML(card, 32);
+  el("fx").appendChild(d);
+  setTimeout(() => {
+    d.style.opacity = 1;
+    d.style.left = b.x + "%"; d.style.top = b.y + "%";
+    d.style.transform = "translate(-50%,-50%) scale(1) rotate(" + (Math.random()*20-10).toFixed(0) + "deg)";
+  }, delay + 20);
+  setTimeout(() => { d.style.opacity = 0; }, delay + 620);
+  setTimeout(() => d.remove(), delay + 950);
+}
+function backHTML(w){
+  return '<div class="card" style="--w:' + w + 'px;padding:2px"><div class="card__art" style="border-width:1px">' +
+    '<img src="' + ART.back + '" alt=""></div></div>';
+}
+function clearFx(){ el("fx").innerHTML = ""; }
+
+/* 새 패 나눠 주기 */
+function runDeal(){
+  clearFx();
+  for (let round = 0; round < 3; round++)
+    for (let i = 0; i < N; i++)
+      flyCard(-1, i, 0, (round * 6 + i) * 55, true);
+}
+
+/* 세금 주고받기 */
+function runTax(){
+  clearFx();
+  const o = order(), n = N;
+  const pairs = [[o[0], o[n-1], 2], [o[1], o[n-2], 1]];
+  const best = hand.slice().sort((a,b) => a-b);
+  let t = 0;
+  pairs.forEach(([hi, lo, k]) => {
+    /* 내가 낀 교환만 앞면. 남들끼리 주고받는 건 원래 안 보이는 정보라 뒷면 */
+    const mine = hi === 0 || lo === 0;
+    for (let j = 0; j < k; j++){
+      const c = lo === 0 ? best[j] : 2 + j;
+      flyCard(lo, hi, c, t, !mine);
+      t += 150;
+    }
+    for (let j = 0; j < k; j++){
+      const c = hi === 0 && sel.length ? hand[sel[j]] : 12;
+      flyCard(hi, lo, c, t, !mine);
+      t += 150;
+    }
+  });
+}
+
+function renderSeats(){
+  const box = el("seats"); box.innerHTML = "";
+  for (let i = 0; i < N; i++){
+    const p = seatPos(i), r = rankOf(i), n = N;
+    const d = document.createElement("div");
+    d.className = "seat" + (i === 0 ? " seat--me" : "") +
+      (step >= 1 && r <= 1 ? " seat--top" : "") + (step >= 1 && r >= n - 2 ? " seat--bot" : "");
+    d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    d.innerHTML =
+      '<span class="seat__r' + (step >= 1 ? " on" : "") + '">' + rankName(r) + '</span>' +
+      '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
+      '<span class="seat__n">' + nameOf(i) + '</span>';
+    box.appendChild(d);
+  }
+}
+
+function renderHand(){
+  const h = el("hand"); h.innerHTML = "";
+  const w = 54, n = hand.length;
+  const step2 = n > 1 ? Math.min(40, (h.clientWidth - w) / (n - 1)) : 0;
+  const total = w + step2 * (n - 1);
+  const taken = takenIdx();
+  hand.forEach((c, i) => {
+    const s = document.createElement("div");
+    s.className = "slot" + (sel.includes(i) ? " slot--sel" : "") + (taken.includes(i) ? " slot--take" : "");
+    s.style.left = ((h.clientWidth - total) / 2 + i * step2) + "px";
+    s.style.zIndex = i;
+    s.innerHTML = cardHTML(c, w);
+    s.onclick = () => { if (!giveCount()) return;
+      const k = sel.indexOf(i);
+      if (k >= 0) sel.splice(k, 1);
+      else if (sel.length < giveCount()) sel.push(i);
+      draw(); };
+    h.appendChild(s);
+  });
+}
+
+/* 내가 세금으로 몇 장을 줘야 하나 */
+function giveCount(){
+  if (step !== 3 || taxSkipped()) return 0;
+  const r = rankOf(0), n = N;
+  return r === 0 ? 2 : r === 1 ? 1 : 0;
+}
+/* 내가 뺏기는 카드 (가장 좋은 = 숫자 작은 순) */
+function takenIdx(){
+  if (step !== 3 || taxSkipped()) return [];
+  const r = rankOf(0), n = N;
+  const k = r === n - 1 ? 2 : r === n - 2 ? 1 : 0;
+  return hand.map((c, i) => i).sort((a, b) => hand[a] - hand[b]).slice(0, k);
+}
+function taxSkipped(){ return SCN[scn].rev !== null && declared; }
+
+function renderMid(){
+  const t = T[lang], m = el("mid"), r = rankOf(0), n = N, o = order();
+  let html = "";
+  if (step === 0){
+    html = '<div class="mid__h">' + t.rankH + '</div><div class="mid__s">' + t.rankS + '</div>';
+  } else if (step === 1){
+    html = '<div class="mid__h">' + t.dealH + '</div><div class="mid__s">' + t.dealS + '</div>';
+  } else if (step === 2){
+    const rev = SCN[scn].rev;
+    html = '<div class="mid__h">' + t.revH + '</div><div class="mid__s">' +
+      (rev === null ? t.revNone
+       : declared ? (rev === 0 ? (scn === 3 ? t.revGreatDone : t.revOther(nameOf(0))) : t.revOther(nameOf(rev)))
+       : rev === 0 ? (scn === 3 ? t.revGreatMine : t.revMine)
+       : t.revOther(nameOf(rev))) + '</div>';
+    if (rev === 0 && !declared)
+      html += '<div class="flow rev"><div class="frow"><span class="frow__c">' +
+        cardHTML(13, 40) + cardHTML(14, 40) + '</span></div></div>';
+  } else if (step === 3){
+    html = '<div class="mid__h">' + t.taxH + '</div><div class="mid__s">' +
+      (taxSkipped() ? t.taxSkip
+       : r === 0 ? t.taxMineTop(nameOf(o[n-1]))
+       : r === 1 ? t.taxMineTop2(nameOf(o[n-2]))
+       : r === n-1 ? t.taxMineBot(nameOf(o[0]))
+       : r === n-2 ? t.taxMineBot2(nameOf(o[1]))
+       : t.taxMid) + '</div>';
+    if (!taxSkipped()){
+      const inC = r === 0 ? [2,3] : r === 1 ? [4] : [];
+      const outC = takenIdx().map(i => hand[i]);
+      let rows = "";
+      if (inC.length) rows += '<div class="frow frow--in"><span class="frow__w">' +
+        nameOf(o[n-1 - (r === 1 ? 1 : 0)]) + ' →</span><span class="frow__c">' +
+        inC.map(c => cardHTML(c, 34)).join("") + '</span></div>';
+      if (outC.length) rows += '<div class="frow frow--out"><span class="frow__w">→ ' +
+        nameOf(o[r === n-1 ? 0 : 1]) + '</span><span class="frow__c">' +
+        outC.map(c => cardHTML(c, 34)).join("") + '</span></div>';
+      if (sel.length) rows += '<div class="frow frow--out"><span class="frow__w">→ ' +
+        nameOf(o[n-1 - (r === 1 ? 1 : 0)]) + '</span><span class="frow__c">' +
+        sel.map(i => cardHTML(hand[i], 34)).join("") + '</span></div>';
+      if (rows) html += '<div class="flow">' + rows + '</div>';
+    }
+  } else {
+    html = '<div class="mid__h">' + t.doneH + '</div><div class="mid__s">' + t.doneS(nameOf(order()[0])) + '</div>';
+  }
+  m.innerHTML = html;
+}
+
+function renderBottom(){
+  const t = T[lang], rev = SCN[scn].rev;
+  el("step").textContent = (step + 1) + ". " + t.steps[step];
+  el("back").textContent = t.back;
+  const g = giveCount();
+  el("hint").innerHTML = step === 3 && g
+    ? (sel.length < g ? t.giveNeed(g - sel.length) : "")
+    : "";
+  const b = el("next");
+  if (step === 2 && rev === 0 && !declared){
+    b.className = "bt-rev"; b.textContent = scn === 3 ? t.declareG : t.declare; b.disabled = false;
+  } else {
+    b.className = "bt-main";
+    b.textContent = step === 4 ? t.start : step === 3 && g ? t.give(g) : t.next;
+    b.disabled = step === 3 && g > 0 && sel.length < g;
+  }
+}
+
+function draw(){
+  renderSeats(); renderMid(); renderHand(); renderBottom();
+  if (step >= 1) window.__myRank = rankName(rankOf(0));
+}
+
+function reset(){
+  clearFx(); step = 0; sel = []; declared = false; reversed = false;
+  hand = SCN[scn].hand.slice();
+  draw();
+}
+function boot(){
+  N = (window.__opts && window.__opts.cap) || 6;
+  buildScn();
+  reset();
+}
+window.__bootTax = boot;
+boot();
+
+el("next").onclick = () => {
+  const rev = SCN[scn].rev;
+  if (step === 2 && rev === 0 && !declared){
+    declared = true;
+    if (scn === 3){
+      reversed = true;
+      el("flash").classList.remove("go"); void el("flash").offsetWidth; el("flash").classList.add("go");
+      draw();
+      document.querySelectorAll(".seat__r").forEach(x => x.classList.add("swap"));
+      setTimeout(() => document.querySelectorAll(".seat__r").forEach(x => x.classList.remove("swap")), 750);
+      return;
+    }
+    draw(); return;
+  }
+  if (step === 2 && rev !== null && rev !== 0 && !declared){ declared = true; }
+  if (step === 3 && giveCount()){ hand = hand.filter((_, i) => !sel.includes(i)); sel = []; }
+  if (step === 3){
+    const take = takenIdx();
+    if (take.length) hand = hand.filter((_, i) => !take.includes(i));
+  }
+  if (step < 4) step++;
+  draw();
+  if (step === 1) runDeal();
+  if (step === 3 && !taxSkipped()) runTax();
+};
+el("back").onclick = reset;
+
+document.querySelectorAll("#scn button").forEach(b => {
+  b.addEventListener("click", () => {
+    scn = +b.dataset.s;
+    document.querySelectorAll("#scn button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    reset();
+  });
+});
+document.querySelectorAll("#lang button").forEach(b => {
+  b.addEventListener("click", () => {
+    lang = b.dataset.l;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("#lang button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  });
+});
+window.addEventListener("resize", draw);
+
+})();
+(function(){
+const __r = window.document.getElementById("table");
+const document = {
+  getElementById: id => __r.querySelector('[id="' + id + '"]'),
+  querySelector: s => __r.querySelector(s),
+  querySelectorAll: s => __r.querySelectorAll(s),
+  createElement: t => window.document.createElement(t),
+  get body(){ return window.document.body },
+  get documentElement(){ return window.document.documentElement },
+  addEventListener: (...a) => window.document.addEventListener(...a)
+};
+
+const HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.webp", "assets/head_10.webp", "assets/head_06.webp", "assets/head_09.webp", "assets/head_07.webp", "assets/head_12.webp"], ART = {"01": "assets/card_01.webp", "02": "assets/card_02.webp", "03": "assets/card_03.webp", "04": "assets/card_04.webp", "05": "assets/card_05.webp", "06": "assets/card_06.webp", "07": "assets/card_07.webp", "08": "assets/card_08.webp", "09": "assets/card_09.webp", "10": "assets/card_10.webp", "11": "assets/card_11.webp", "12": "assets/card_12.webp", "jokerA": "assets/joker_a.webp", "jokerB": "assets/joker_b.webp"};
+const KO_N = ["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"];
+const EN_N = ["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"];
+const T = {
+  ko:{ roundN:n=>n+"판째", joker:"카멜레온",
+       myTurn:"내 차례", theirTurn:n=>n+" 차례",
+       left:c=>'남은 <b>'+c+'</b>장', tagTurn:"차례", tagPass:"패스", tagOut:"완주",
+       lead:"원하는 장수로 시작하세요", top1:'<b>1번</b>이 나왔습니다. 아무도 받을 수 없습니다',
+       need:(c,n)=>'<b>'+c+'장</b>을 <b>'+n+'번 이하</b>로 받으세요',
+       emptyPile:"바닥이 비었습니다<br>원하는 카드를 내세요",
+       pass:"패스", pick:"카드를 고르세요", play:n=>n+"장 내기",
+       notTurn:"상대 차례입니다", mix:"같은 숫자만 함께 낼 수 있습니다",
+       cnt:n=>n+"장을 맞춰 주세요", lower:"더 낮은 숫자를 내세요",
+       autoPass:"시간 초과 · 자동 패스",
+       close:"다시 누르면 접힙니다" },
+
+  en:{ roundN:n=>"Round "+n, joker:"CHAMELEON",
+       myTurn:"Your turn", theirTurn:n=>n+"'s turn",
+       left:c=>'<b>'+c+'</b> left', tagTurn:"turn", tagPass:"passed", tagOut:"done",
+       lead:"Lead with any number of cards", top1:'<b>1</b> is out. Nobody can beat it',
+       need:(c,n)=>'Beat with <b>'+c+' cards</b> of <b>'+n+' or lower</b>',
+       emptyPile:"The pile is empty<br>Play anything you like",
+       pass:"Pass", pick:"Select cards", play:n=>"Play "+n,
+       notTurn:"Opponent's turn", mix:"Cards must share one number",
+       cnt:n=>"Play exactly "+n, lower:"Play a lower number",
+       autoPass:"Time up · passed",
+       close:"Tap again to close" }
+};
+let lang = "ko";
+const NAMES = KO_N;
+const el = id => document.getElementById(id);
+const isJ = c => c >= 13;   // 카멜레온 2장: 13=광대, 14=신사
+
+/* 0번이 나. 시계 방향으로 상대 */
+const ALL = ["나","민지","준호","서연","태윤","하은","지훈","예린"];
+let SEATS = ALL.slice(0, 6).map(n => ({n: n, c: 0, s: ""}));
+
+/* 80장 덱: 1번 1장 ~ 12번 12장 + 카멜레온 2장 */
+function makeDeck(){
+  const d = [];
+  for (let n = 1; n <= 12; n++) for (let i = 0; i < n; i++) d.push(n);
+  d.push(13, 14);
+  for (let i = d.length - 1; i > 0; i--){
+    const k = Math.floor(Math.random() * (i + 1));
+    [d[i], d[k]] = [d[k], d[i]];
+  }
+  return d;
+}
+function dealAll(){
+  const d = makeDeck(), n = SEATS.length;
+  SEATS.forEach(s => s.hold = []);
+  d.forEach((c, i) => SEATS[i % n].hold.push(c));
+  SEATS.forEach(s => { s.hold.sort((a,b) => a-b); s.c = s.hold.length; });
+}
+dealAll();
+let hand = SEATS[0].hold;
+function boot(){
+  const n = (window.__opts && window.__opts.cap) || 6;
+  SEATS = ALL.slice(0, n).map(x => ({n: x, c: 0, s: ""}));
+  dealAll();
+  hand = SEATS[0].hold;
+  sel = []; trick = []; turn = 0; lastPlayer = null; busy = false; animated = 0; spread = false;
+  draw(); resetTimer();
+}
+window.__bootTable = boot;
+let sel = [];
+let trick = [];              // 이번 판에 나온 것들
+let turn = 0;                // 지금 차례
+let lastPlayer = null;
+let busy = false;
+let animated = 0;   // 이미 날아온 카드 수
+let spread = false; // 바닥 펼침 여부
+
+const cur = () => trick.length ? trick[trick.length - 1] : null;
+const label = n => isJ(n) ? T[lang].joker : (lang === "ko" ? KO_N : EN_N)[n-1];
+const art = n => n === 13 ? ART.jokerA : n === 14 ? ART.jokerB : ART[String(n).padStart(2,"0")];
+
+function cardHTML(n, w){
+  if (isJ(n)) return '<div class="card is-joker" style="--w:' + w + 'px">' +
+    '<div class="card__band"><span class="card__name">카멜레온</span></div>' +
+    '<div class="card__art"><img src="' + art(n) + '" alt=""></div>' +
+    '<div class="card__band"></div></div>';
+  return '<div class="card" style="--w:' + w + 'px">' +
+    '<div class="card__band"><span class="card__num">' + n + '</span>' +
+    '<span class="card__name">' + label(n) + '</span>' +
+    '<span class="card__num">' + n + '</span></div>' +
+    '<div class="card__art"><img src="' + art(n) + '" alt=""></div>' +
+    '<div class="card__band"><span class="card__num">' + n + '</span>' +
+    '<span class="card__num">' + n + '</span></div></div>';
+}
+
+function seatPos(i){
+  const a = (Math.PI / 2) + (i * 2 * Math.PI / SEATS.length);
+  return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
+}
+
+function maxCount(n){
+  const j = hand.filter(isJ).length;
+  return isJ(n) ? j : hand.filter(x => x === n).length + j;
+}
+function isDead(n){
+  const c = cur(); if (!c) return false;
+  if (isJ(n)) return !KO_N.some((_, i) => i + 1 < c.num && maxCount(i + 1) >= c.count);
+  return !(n < c.num && maxCount(n) >= c.count);
+}
+function effective(l){
+  const r = l.filter(x => !isJ(x));
+  if (!r.length) return 13;
+  return r.every(x => x === r[0]) ? r[0] : null;
+}
+function legal(l){
+  if (!l.length) return false;
+  const e = effective(l); if (e === null) return false;
+  const c = cur(); if (!c) return true;
+  return l.length === c.count && e < c.num;
+}
+
+function fanHTML(c){
+  if (!c) return '<div class="fan"></div>';
+  const shown = Math.min(c, 7), step = 5;
+  const w = 13 + (shown - 1) * step;
+  let s = '<div class="fan" style="width:' + w + 'px">';
+  for (let i = 0; i < shown; i++)
+    s += '<i style="left:' + (i * step) + 'px;z-index:' + i + '"></i>';
+  return s + '</div>';
+}
+
+function renderSeats(){
+  const box = el("seats"); box.innerHTML = "";
+  SEATS.forEach((s, i) => {
+    const p = seatPos(i);
+    const d = document.createElement("div");
+    d.className = "seat" + (i === 0 ? " seat--me" : "") +
+      (turn === i && !busy ? " seat--turn" : "") +
+      (s.s === "pass" ? " seat--pass" : "") + (s.c === 0 ? " seat--out" : "");
+    d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    d.style.zIndex = 6 + Math.round(p.y);
+    const tag = s.c === 0 ? "완주" : turn === i ? "차례" : s.s === "pass" ? "패스" : "";
+    d.innerHTML = (tag ? '<span class="seat__tag">' + tag + '</span>' : '') +
+      '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
+      '<span class="seat__n">' + s.n + '</span>' +
+      (i === 0 ? '' : fanHTML(s.c)) +
+      '<span class="seat__c">' + T[lang].left(s.c) + '</span>';
+    box.appendChild(d);
+  });
+}
+
+function renderPile(){
+  const p = el("pile"); p.innerHTML = "";
+  if (spread && trick.length){
+    const t = T[lang];
+    const maxC = Math.min(6, Math.max(...trick.map(x => x.count)));
+    const cw = Math.max(18, Math.min(32, Math.floor((196 - (maxC - 1) * 3) / maxC)));
+    p.innerHTML = '<div class="spread">' + trick.slice().reverse().map((x, idx) =>
+      '<div class="srow' + (idx === 0 ? ' srow--new' : '') + '">' +
+        '<span class="srow__w">' + SEATS[x.by].n + '</span>' +
+        '<span class="srow__c">' +
+          (x.cards || Array.from({length: x.count}, () => x.num))
+            .slice(0, 6).map(cc => cardHTML(cc, cw, isJ(cc) ? x.num : null)).join("") +
+          (x.count > 6 ? '<span class="srow__p">+' + (x.count - 6) + '</span>' : '') +
+        '</span>' +
+      '</div>').join("") + '<div class="spread__t">' + t.close + '</div></div>';
+    return;
+  }
+  if (!trick.length){
+    p.innerHTML = '<div class="pile__hint">' + T[lang].emptyPile + '</div>';
+    animated = 0;
+    return;
+  }
+  const rect = el("ring").getBoundingClientRect();
+  trick.forEach((t, k) => {
+    const from = seatPos(t.by);
+    const g = document.createElement("div");
+    g.className = "play" + (k < trick.length - 1 ? " play--old" : "") +
+      (k >= animated ? " play--new" : "");
+    const d = trick.length - 1 - k;
+    g.style.setProperty("--r", d === 0 ? "0deg" : (((k * 37) % 19) - 9 - d * 3) + "deg");
+    g.style.setProperty("--dy", (-d * 13) + "px");
+    g.style.setProperty("--sc", (1 - d * 0.07).toFixed(3));
+    g.style.setProperty("--fx", ((from.x - 50) / 100 * rect.width).toFixed(0) + "px");
+    g.style.setProperty("--fy", ((from.y - 50) / 100 * rect.height).toFixed(0) + "px");
+    g.style.zIndex = k;
+    const cw = Math.max(20, Math.min(52, Math.floor((rect.width * 0.56 - (t.count - 1) * 4) / t.count)));
+    g.innerHTML = (t.cards || Array.from({length: t.count}, () => t.num))
+      .map(cc => cardHTML(cc, cw, isJ(cc) ? t.num : null)).join("");
+    p.appendChild(g);
+  });
+  animated = trick.length;
+}
+
+function renderHand(){
+  const h = el("hand"); h.innerHTML = "";
+  const w = 60, n = hand.length;
+  const step = n > 1 ? Math.min(36, (h.clientWidth - w) / (n - 1)) : 0;
+  const total = w + step * (n - 1);
+  hand.forEach((c, i) => {
+    const s = document.createElement("div");
+    s.className = "slot" + (sel.includes(i) ? " slot--sel" : "") + (isDead(c) ? " slot--dead" : "");
+    s.style.left = ((h.clientWidth - total) / 2 + i * step) + "px";
+    s.style.zIndex = i;
+    s.innerHTML = cardHTML(c, w);
+    s.onclick = () => { if (turn !== 0 || busy) return;
+      const k = sel.indexOf(i); if (k >= 0) sel.splice(k,1); else sel.push(i); draw(); };
+    h.appendChild(s);
+  });
+  SEATS[0].c = hand.length;
+}
+
+function renderBottom(){
+  const c = cur();
+  const t = T[lang];
+  el("need").innerHTML = c
+    ? (c.num === 1 ? t.top1 : t.need(c.count, c.num - 1))
+    : (turn === 0 ? t.lead : "");
+  el("phase").textContent = turn === 0 ? t.myTurn : t.theirTurn(SEATS[turn].n);
+  const rn = window.__roundNo || 1;
+  el("round").textContent = t.roundN(rn) + (window.__myRank ? " · " + window.__myRank : "");
+  el("pass").textContent = t.pass;
+  const list = sel.map(i => hand[i]);
+  const ok = legal(list) && turn === 0 && !busy;
+  const b = el("play");
+  b.disabled = !ok;
+  b.textContent = turn !== 0 ? t.notTurn
+    : !list.length ? t.pick
+    : ok ? t.play(list.length)
+    : effective(list) === null ? t.mix
+    : (cur() && list.length !== cur().count) ? t.cnt(cur().count)
+    : t.lower;
+  el("pass").disabled = turn !== 0 || busy;
+}
+
+function draw(){ renderSeats(); renderPile(); renderHand(); renderBottom(); }
+
+let timerId = null;
+function resetTimer(){
+  el("timer").innerHTML = "<i></i>";
+  if (timerId) clearTimeout(timerId);
+  if (turn === 0 && !busy) timerId = setTimeout(() => { if (turn === 0 && !busy) doPass(true); }, 15000);
+}
+
+function clearTrick(){
+  trick = []; spread = false; SEATS.forEach(s => s.s = "");
+  turn = lastPlayer; busy = false; draw(); resetTimer();
+  if (turn !== 0) setTimeout(botTurn, 900);
+}
+
+function advance(){
+  const alive = SEATS.filter((s, i) => s.c > 0 && s.s !== "pass").length;
+  if (alive <= 1 && trick.length){ setTimeout(clearTrick, 950); return; }
+  do { turn = (turn + 1) % SEATS.length; }
+  while (SEATS[turn].c === 0 || SEATS[turn].s === "pass");
+  busy = false; draw(); resetTimer();
+  if (turn !== 0) setTimeout(botTurn, 950);
+}
+
+/* 손패에서 낼 수 있는 조합 중 가장 약한(숫자 큰) 것 */
+function botPick(hold, c){
+  const jok = hold.filter(isJ).length;
+  const opts = [];
+  const maxN = c ? c.num - 1 : 12;
+  for (let n = 1; n <= maxN; n++){
+    const same = hold.filter(x => x === n).length;
+    if (!same) continue;
+    if (c){ if (same + jok >= c.count) opts.push({num:n, count:c.count}); }
+    else opts.push({num:n, count:same});
+  }
+  if (!opts.length) return null;
+  opts.sort((a, b) => b.num - a.num);
+  return opts[0];
+}
+function takeFrom(hold, num, count){
+  let left = count; const out = [];
+  for (let i = hold.length - 1; i >= 0 && left; i--)
+    if (hold[i] === num){ hold.splice(i, 1); out.push(num); left--; }
+  for (let i = hold.length - 1; i >= 0 && left; i--)
+    if (isJ(hold[i])){ out.push(hold[i]); hold.splice(i, 1); left--; }
+  return out.sort((a, b) => a - b);
+}
+function botTurn(){
+  busy = true;
+  const s = SEATS[turn], c = cur();
+  const pick = botPick(s.hold, c);
+  if (pick && (!c || Math.random() < .82)){
+    const used = takeFrom(s.hold, pick.num, pick.count);
+    s.c = s.hold.length; lastPlayer = turn;
+    trick.push({by: turn, num: pick.num, count: pick.count, cards: used});
+  } else s.s = "pass";
+  draw();
+  setTimeout(advance, 620);
+}
+
+el("play").onclick = () => {
+  const list = sel.map(i => hand[i]); if (!legal(list)) return;
+  const e = effective(list);
+  trick.push({by: 0, num: e, count: list.length, cards: list.slice().sort((a,b) => a-b)});
+  hand = hand.filter((_, i) => !sel.includes(i));
+  SEATS[0].hold = hand; SEATS[0].c = hand.length;
+  sel = []; lastPlayer = 0; busy = true; draw();
+  setTimeout(advance, 620);
+};
+function doPass(auto){
+  if (turn !== 0 || busy) return;
+  if (timerId) clearTimeout(timerId);
+  sel = []; SEATS[0].s = "pass"; busy = true;
+  if (auto) flash(T[lang].autoPass);
+  draw(); setTimeout(advance, 500);
+}
+el("pass").onclick = () => doPass(false);
+
+function flash(msg){
+  const f = el("flash"); f.textContent = msg; f.style.opacity = 1;
+  setTimeout(() => f.style.opacity = 0, 1200);
+}
+
+el("ring").addEventListener("click", e => {
+  if (!trick.length) return;
+  if (e.target.closest(".play, .spread")) { spread = !spread; renderPile(); }
+});
+
+document.querySelectorAll("#lang button").forEach(b => {
+  b.addEventListener("click", () => {
+    lang = b.dataset.l;
+    document.documentElement.lang = lang;
+    document.querySelectorAll("#lang button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    draw();
+  });
+});
+
+draw(); resetTimer();
+window.addEventListener("resize", draw);
+
+})();
+
+function go(id){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("is-on"));
+  document.getElementById(id).classList.add("is-on");
+  window.scrollTo(0,0);
+  /* 숨겨져 있는 동안은 폭이 0이라 손패 위치가 어긋난다. 보이는 순간 다시 그린다 */
+  requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
+  /* 방 설정(인원 등)을 그 화면에 반영한다 */
+  if (id === "draw"  && window.__bootDraw)  window.__bootDraw();
+  if (id === "table" && window.__bootTable) window.__bootTable();
+  if (id === "tax"   && window.__bootTax)   window.__bootTax();
+}
+document.querySelector("#entry #start").addEventListener("click", () => go("lobby"));
+
+/* 로비 → 대기실 */
+["#lobby #btQuick", "#lobby #btNew", "#lobby #btJoin"].forEach(sel => {
+  const b = document.querySelector(sel);
+  if (b) b.addEventListener("click", () => go("room"));
+});
+/* 대기실 시작 → 세금·혁명 */
+document.querySelector("#room #action").addEventListener("click", e => {
+  const b = e.target.closest(".btn-primary");
+  if (!b || b.disabled) return;
+  go("draw");                     /* 첫 판은 뽑기부터 */
+});
+/* 뽑기 완료 → 1판 시작 (첫 판은 세금 없음) */
+document.querySelector("#draw #go").addEventListener("click", e => {
+  if (!e.currentTarget.disabled) go("table");
+});
+/* 판이 끝나면 계급·세금 화면으로. 세금을 끈 방은 건너뛴다 */
+document.querySelector("#table #endRound").addEventListener("click", () => {
+  go((window.__opts && window.__opts.tax === false) ? "draw" : "tax");
+});
+/* 세금·혁명의 마지막 "판 시작" → 테이블 */
+document.querySelector("#tax #next").addEventListener("click", e => {
+  const label = e.currentTarget.textContent.trim();
+  if (label === "판 시작" || label === "Start round"){
+    window.__roundNo = (window.__roundNo || 1) + 1;
+    setTimeout(() => go("table"), 120);
+  }
+}, true);
+/* 뒤로가기 */
+document.querySelectorAll("[data-back]").forEach(b =>
+  b.addEventListener("click", () => go(b.dataset.back)));
+
+</script>
+</body>
+</html>
