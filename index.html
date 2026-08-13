@@ -443,7 +443,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room :focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
 
 #room .screen{position:relative;z-index:1;
-  height:100%;display:flex;flex-direction:column;overflow-y:auto;
+  height:100%;display:flex;flex-direction:column;overflow:hidden;
   padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);
 }
 
@@ -456,22 +456,17 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .view button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
 
 #room .roomno{position:relative;z-index:3;
-  margin-top:12px;padding:12px 14px;border:1px solid var(--gold-dim);border-radius:3px;
-  background:rgba(0,0,0,.3);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-top:6px;padding:6px 10px;border:1px solid rgba(198,154,62,.5);border-radius:3px;
+  background:rgba(0,0,0,.42);
+  display:flex;align-items:center;gap:8px;align-self:flex-start;
 }
-#room .roomno__l{font-size:11px;letter-spacing:.24em;color:var(--gold);margin-bottom:5px}
-#room .roomno__n{
-  font-family:"Noto Serif KR",serif;font-weight:900;
-  font-size:30px;letter-spacing:.2em;line-height:1;
-}
-#room .roomno button{
-  padding:9px 13px;border:1px solid var(--gold-dim);border-radius:2px;
-  font-size:12.5px;color:var(--parchment-dim);white-space:nowrap;
-}
+#room .roomno__l{font-size:9.5px;letter-spacing:.16em;color:var(--gold)}
+#room .roomno__n{font-family:"Noto Serif KR",serif;font-weight:900;font-size:15px;letter-spacing:.14em;line-height:1}
+#room .roomno button{padding:3px 8px;border:1px solid var(--gold-dim);border-radius:2px;
+  font-size:10.5px;color:var(--parchment-dim);white-space:nowrap}
 
 #room /* ---------- table ---------- */
-.tablewrap{flex:1;min-height:250px;position:static;margin:10px 0 4px}
+.tablewrap{flex:1;min-height:180px;position:static;margin:8px 0 4px}
 #room .felt{background:none !important;box-shadow:none !important;
   position:absolute;left:14%;right:14%;top:10%;bottom:10%;
   border-radius:50%;
@@ -483,7 +478,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   background:repeating-linear-gradient(51deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
 }
 #room .felt__c{z-index:2;
-  position:absolute;left:49%;top:32.5%;transform:translate(-50%,-50%);
+  position:absolute;left:49%;transform:translate(-50%,-50%);
   text-align:center;width:min(160px,46%);
 }
 #room .felt__n{font-family:"Gowun Batang",serif;font-weight:700;font-size:19px;color:#D9E6DC}
@@ -516,37 +511,37 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 #room /* ---------- controls ---------- */
 .opt{position:relative;z-index:3;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:11px 13px;border:1px solid #33261A;border-radius:3px;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:8px 11px;border:1px solid #33261A;border-radius:3px;margin-bottom:6px;
   background:rgba(0,0,0,.24);
 }
-#room .opt__t{font-size:13.5px}
-#room .opt__d{font-size:11.5px;color:#8E8064;margin-top:3px;line-height:1.5}
+#room .opt__t{font-size:12.5px}
+#room .opt__d{font-size:10.5px;color:#9C8C6E;margin-top:2px;line-height:1.45}
 #room .stepper{display:flex;align-items:center;gap:2px;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden;flex:none}
-#room .stepper button{width:34px;height:32px;font-size:17px;line-height:1;color:var(--parchment-dim)}
+#room .stepper button{width:30px;height:28px;font-size:17px;line-height:1;color:var(--parchment-dim)}
 #room .stepper button:disabled{opacity:.32}
 #room .stepper span{
-  min-width:34px;text-align:center;
-  font-family:"Noto Serif KR",serif;font-weight:900;font-size:15px;
+  min-width:30px;text-align:center;
+  font-family:"Noto Serif KR",serif;font-weight:900;font-size:14px;
 }
-#room .sw{width:46px;height:26px;border-radius:13px;border:1px solid var(--gold-dim);background:rgba(0,0,0,.4);position:relative;flex:none}
+#room .sw{width:42px;height:24px;border-radius:13px;border:1px solid var(--gold-dim);background:rgba(0,0,0,.4);position:relative;flex:none}
 #room .sw::after{
-  content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+  content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
   background:#7B6C50;transition:transform .18s ease,background .18s ease;
 }
 #room .sw[aria-checked="true"]{background:rgba(176,138,52,.3);border-color:var(--gold)}
-#room .sw[aria-checked="true"]::after{transform:translateX(20px);background:var(--gold-hi)}
+#room .sw[aria-checked="true"]::after{transform:translateX(18px);background:var(--gold-hi)}
 
 #room .btn-primary{position:relative;z-index:3;
-  width:100%;padding:16px;border-radius:2px;
+  width:100%;padding:13px;border-radius:2px;
   background:linear-gradient(180deg,#7A2226,#4A1418);
   border:1px solid var(--gold);
-  font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.08em;
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.08em;
   box-shadow:0 1px 0 rgba(227,198,124,.26) inset,0 6px 18px rgba(0,0,0,.5);
 }
 #room .btn-primary:disabled{opacity:.42;box-shadow:none}
 #room .waiting{position:relative;z-index:3;
-  width:100%;padding:16px;border:1px solid var(--gold-dim);border-radius:2px;
+  width:100%;padding:13px;border:1px solid var(--gold-dim);border-radius:2px;
   text-align:center;font-size:14px;color:var(--parchment-dim);
 }
 #room .dots::after{content:"";animation:dots 1.4s steps(4,end) infinite}
@@ -963,10 +958,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
     <button class="back" data-back="lobby" aria-label="나가기">‹</button>
     <div class="bar__t" id="bt"></div>
     <div style="display:flex;gap:7px">
-      <div class="view" id="lang">
-        <button data-l="ko" aria-pressed="true">한</button>
-        <button data-l="en" aria-pressed="false">EN</button>
-      </div>
+      <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
       <div class="view" id="view">
         <button data-v="host" aria-pressed="true">방장</button>
         <button data-v="guest" aria-pressed="false">참가자</button>
@@ -975,10 +967,8 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   </div>
 
   <div class="roomno">
-    <div>
-      <div class="roomno__l" id="rl"></div>
-      <div class="roomno__n">4 7 2 9</div>
-    </div>
+    <span class="roomno__l" id="rl"></span>
+    <span class="roomno__n">4729</span>
     <button id="rc"></button>
   </div>
 
@@ -1525,13 +1515,13 @@ const L = {
        needMore:"4명부터 시작할 수 있습니다",
        canStart:"지금 시작하거나 더 기다리셔도 됩니다",
        full:"자리가 다 찼습니다", empty:"빈 자리", hostTag:"방장",
-       capT:"방 인원", capD:"4명에서 8명까지 정할 수 있습니다.", capDG:"방장이 정합니다.",
-       rndT:"몇 판까지", rndD:"최소 3판입니다. 판 수가 끝나면 총점이 가장 높은 분이 우승합니다.",
+       capT:"방 인원", capD:"4명 \u2013 8명", capDG:"방장이 정합니다.",
+       rndT:"플레이 판 수 설정", rndD:"최소 3판부터 시작",
        rndDG:"방장이 정합니다.", rndU:n=>n+"판",
        taxT:"세금과 혁명",
-       taxD:"등수에 따라 카드를 주고받고, 카멜레온 두 장으로 뒤집는 규칙입니다. 끄면 카드만으로 겨룹니다.",
-       clrT:"2번 카드로 판 엎기",
-       clrD:"2번을 내면 바닥을 비우고 다시 선을 잡습니다. 해외에서 익숙한 방식입니다.",
+       taxD:"등수에 따라 카드를 교환하고, 조커 두 장으로 순위를 뒤집는 규칙입니다.",
+       clrT:"2번 컷",
+       clrD:"2번 카드를 내면 바닥을 비우고 다시 선을 잡습니다.",
        on:"켜져 있습니다.", off:"꺼져 있습니다.",
        start:"시작하기", needFour:"4명이 모여야 시작합니다",
        wait:"방장이 시작하기를 기다리는 중입니다" },
@@ -1540,13 +1530,13 @@ const L = {
        needMore:"Four players are needed to start",
        canStart:"Start now, or wait for more",
        full:"The table is full", empty:"Open seat", hostTag:"HOST",
-       capT:"Table size", capD:"Anywhere from 4 to 8 players.", capDG:"The host decides.",
-       rndT:"Rounds", rndD:"Three at least. Highest total score after the last round wins.",
+       capT:"Table size", capD:"4 \u2013 8 players", capDG:"The host decides.",
+       rndT:"Number of rounds", rndD:"Three at least",
        rndDG:"The host decides.", rndU:n=>n+"",
        taxT:"Tax and revolution",
-       taxD:"Cards change hands by rank, and two chameleons overturn it. Turn it off for a plain card game.",
-       clrT:"Clear the pile with a 2",
-       clrD:"Playing a 2 clears the pile and you lead again. Familiar outside Korea.",
+       taxD:"Cards change hands by standing, and two jokers overturn it.",
+       clrT:"Two-cut",
+       clrD:"Playing a 2 clears the pile and you lead again.",
        on:"On.", off:"Off.",
        start:"Start", needFour:"Four players are needed",
        wait:"Waiting for the host to start" }
@@ -1560,13 +1550,27 @@ let rounds = 5;       // 몇 판까지
 let taxOn = true;     // 세금·혁명 사용
 let role = "host";
 
+/* 남은 공간에 맞춰 배경 타원과 자리를 같이 옮긴다 */
+function ringBox(){
+  const scr = document.querySelector(".screen").getBoundingClientRect();
+  const tw  = document.querySelector(".tablewrap").getBoundingClientRect();
+  const H = scr.height || 1;
+  const cyPx = (tw.top + tw.height / 2) - scr.top;
+  const ryPx = Math.max(44, Math.min(H * 0.135, tw.height / 2 - 52));
+  const sec = window.document.getElementById("room");
+  if (sec) sec.style.backgroundPositionY = Math.round(cyPx - H * 0.44) + "px";
+  return {cx: 49, cy: cyPx / H * 100, rx: 35, ry: ryPx / H * 100};
+}
+let RB = {cx: 49, cy: 34, rx: 35, ry: 11.5};
+
 function renderSeats(){
+  RB = ringBox();
   const box = document.getElementById("seats");
   box.innerHTML = "";
   for (let i = 0; i < cap; i++){
     const a = (Math.PI / 2) + (i * 2 * Math.PI / cap);   // 아래에서 시계 방향
-    const left = 49 + Math.cos(a) * -36;
-    const top  = 32.5 + Math.sin(a) * 12;
+    const left = RB.cx + Math.cos(a) * -RB.rx;
+    const top  = RB.cy + Math.sin(a) * RB.ry;
     const filled = i < joined;
     const el = document.createElement("div");
     el.className = "seat" + (filled ? "" : " seat--empty") + (i === 0 ? " seat--me" : "");
@@ -1588,6 +1592,8 @@ function renderSeats(){
   document.getElementById("rc").textContent = t.copy;
   document.querySelector('#view [data-v="host"]').textContent = t.host;
   document.querySelector('#view [data-v="guest"]').textContent = t.guest;
+  const fc = document.querySelector(".felt__c");
+  if (fc) fc.style.top = RB.cy.toFixed(1) + "%";
   document.getElementById("feltN").textContent = t.count(joined, cap);
   document.getElementById("feltS").textContent =
     joined < 4 ? t.needMore : joined < cap ? t.canStart : t.full;
@@ -1657,6 +1663,7 @@ function draw(){ renderSeats(); renderControls();
   window.__opts = {rounds: rounds, tax: taxOn, clear2: clear2, cap: cap};
 }
 draw();
+window.addEventListener("resize", draw);
 
 document.querySelectorAll("#lang button").forEach(b => {
   b.addEventListener("click", () => {
@@ -2160,7 +2167,7 @@ const T = {
        pass:"패스", pick:"카드를 고르세요", play:n=>n+"장 내기",
        notTurn:"상대 차례입니다", mix:"같은 숫자만 함께 낼 수 있습니다",
        cnt:n=>n+"장을 맞춰 주세요", lower:"더 낮은 숫자를 내세요",
-       autoPass:"시간 초과 · 자동 패스", cleared:"2번 · 판을 엎었습니다", endR:"판 종료",
+       autoPass:"시간 초과 · 자동 패스", cleared:"판을 비웠습니다 · 다시 선", endR:"판 종료",
        close:"다시 누르면 접힙니다" },
 
   en:{ roundN:n=>"Round "+n, joker:"CHAMELEON",
@@ -2172,7 +2179,7 @@ const T = {
        pass:"Pass", pick:"Select cards", play:n=>"Play "+n,
        notTurn:"Opponent's turn", mix:"Cards must share one number",
        cnt:n=>"Play exactly "+n, lower:"Play a lower number",
-       autoPass:"Time up · passed", cleared:"A 2 · pile cleared", endR:"End round",
+       autoPass:"Time up · passed", cleared:"Pile cleared \u00B7 you lead again", endR:"End round",
        close:"Tap again to close" }
 };
 let lang = window.__lang || "ko";
@@ -2521,7 +2528,10 @@ function botTurn(){
   setTimeout(advance, 620);
 }
 
+/* 1번은 아무도 못 받으니 즉시 정리하고 낸 사람이 다시 선.
+   2번 컷을 켠 방이면 2번도 같다 */
 function clearsPile(numValue){
+  if (numValue === 1) return true;
   return numValue === 2 && window.__opts && window.__opts.clear2;
 }
 el("play").onclick = () => {
