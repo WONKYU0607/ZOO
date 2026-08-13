@@ -163,10 +163,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 *{box-sizing:border-box;margin:0;padding:0}
 #lobby, #lobby{height:100%}
 #lobby{
-  background:
-    radial-gradient(112% 50% at 50% 0%,rgba(122,34,38,.42),transparent 64%),
-    radial-gradient(84% 44% at 50% 104%,rgba(176,138,52,.12),transparent 70%),
-    var(--ink);
+  background:var(--ink) url(assets/throne.webp) center/cover no-repeat;
   color:var(--parchment);
   font-family:"Gowun Dodum",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;
@@ -176,7 +173,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #lobby button{cursor:pointer}
 #lobby :focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
 
-#lobby .screen{
+#lobby .screen{position:relative;z-index:1;
   height:100%;display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 20px);
 }
@@ -301,6 +298,9 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #lobby .rule p{font-size:13px;line-height:1.75;color:#B7A683}
 #lobby .rule p b{color:var(--gold-hi);font-weight:400}
 
+#lobby .veil{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,5,2,.3),rgba(8,5,2,.52) 42%,rgba(6,4,2,.78))}
+
 
 #draw{
   --card-ink:#3B2A12; --card-ink-2:#5A431C;
@@ -327,7 +327,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #draw .ring{height:66%;flex:none;position:relative;margin-top:4px}
 #draw .plane{position:absolute;left:0;right:0;top:19%;bottom:13%}
 #draw .pad{flex:1;min-height:0}
-#draw .felt{position:absolute;left:2%;right:2%;top:2%;bottom:2%;border-radius:50%;
+#draw .felt{position:absolute;left:14%;right:14%;top:10%;bottom:10%;border-radius:50%;
   background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
   box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4)}
 
@@ -442,7 +442,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room /* ---------- table ---------- */
 .tablewrap{flex:1;min-height:240px;position:relative;margin:14px 0 12px}
 #room .felt{
-  position:absolute;left:8%;right:8%;top:12%;bottom:12%;
+  position:absolute;left:20%;right:20%;top:20%;bottom:20%;
   border-radius:50%;
   background:radial-gradient(72% 60% at 50% 34%,#3A6A52,var(--felt-1) 46%,var(--felt-2));
   box-shadow:0 0 0 5px rgba(80,58,22,.72),0 0 0 7px rgba(198,154,60,.34),0 18px 40px rgba(0,0,0,.6);
@@ -549,7 +549,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #tax /* ring */
 .ring{flex:1;min-height:0;position:relative;margin-top:6px}
 #tax .plane{position:absolute;left:0;right:0;top:15%;bottom:11%}
-#tax .felt{position:absolute;left:2%;right:2%;top:2%;bottom:2%;border-radius:50%;
+#tax .felt{position:absolute;left:14%;right:14%;top:10%;bottom:10%;border-radius:50%;
   background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
   box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4)}
 #tax .seat{position:absolute;width:78px;transform:translate(-50%,-50%);
@@ -581,15 +581,15 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #tax .seat__r.swap{animation:swap .7s ease both}
 @keyframes swap{0%{opacity:1}30%{opacity:0;transform:translateY(6px) scale(.8)}60%{opacity:0;transform:translateY(-6px) scale(.8)}100%{opacity:1;transform:none}}
 #tax .mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:min(280px,78vw);text-align:center;z-index:8}
-#tax .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:19px;margin-bottom:7px}
-#tax .mid__s{font-size:12.5px;color:#A9C0B0;line-height:1.7}
+  width:min(196px,52%);text-align:center;z-index:8}
+#tax .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;margin-bottom:6px}
+#tax .mid__s{font-size:11.5px;color:#A9C0B0;line-height:1.65}
 #tax .mid__s b{color:var(--gold-hi);font-weight:400}
 #tax .flow{margin-top:12px;display:flex;flex-direction:column;gap:9px;
   padding:12px 11px;border-radius:6px;background:rgba(8,16,11,.9);
   border:1px solid rgba(198,154,60,.42)}
 #tax .frow{display:flex;align-items:center;gap:8px;justify-content:center}
-#tax .frow__w{font-size:10.5px;color:#9FB6A5;white-space:nowrap;min-width:74px;text-align:right}
+#tax .frow__w{font-size:10px;color:#9FB6A5;white-space:nowrap;min-width:52px;text-align:right}
 #tax .frow__c{display:flex;gap:3px}
 #tax .frow__c .card{animation:fly .4s cubic-bezier(.2,.8,.3,1) both}
 #tax .frow--in .frow__c .card{--fx:-70px}
@@ -643,6 +643,10 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #result .screen{height:100%;display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 16px)}
 
+#result .lang{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:16px;z-index:5;
+  display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+#result .lang button{padding:4px 8px;font-size:10px;color:var(--parchment-dim)}
+#result .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
 #result .head{text-align:center;margin-bottom:14px;flex:none}
 #result .head__k{font-family:"Noto Serif KR",serif;font-weight:600;font-size:11px;
   letter-spacing:.3em;text-indent:.3em;color:var(--gold)}
@@ -686,16 +690,20 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #table, #table{height:100%}
 #table{
   --back:url(assets/back.webp);
-  background:radial-gradient(96% 44% at 50% 34%,#2E5540,#16291F 54%,#0B140F);
+  background:#0B140F url(assets/tablebg.webp) center/cover no-repeat;
   color:var(--parchment);font-family:"Gowun Dodum",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overflow:hidden;
 }
 #table button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 #table :focus-visible{outline:2px solid var(--gold-hi);outline-offset:2px}
-#table .screen{height:100%;display:flex;flex-direction:column;
+#table .screen::before{content:"";position:absolute;left:0;right:0;top:0;height:16%;z-index:0;
+  pointer-events:none;background:linear-gradient(180deg,rgba(6,10,7,.72),transparent)}
+#table .screen::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;z-index:0;
+  pointer-events:none;background:linear-gradient(180deg,transparent,rgba(6,10,7,.72) 46%,rgba(5,8,6,.9))}
+#table .screen{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 10px)}
 
-#table .bar{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+#table .bar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 4px}
 #table .bar__x{font-size:19px;line-height:1;color:#8FA898;padding:2px 6px}
 #table .bar__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:13.5px;color:#CFE0D4}
 #table .bar__s{font-size:11.5px;color:#8FA898}
@@ -705,7 +713,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 #table /* 바닥 펼치기 */
 .spread{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:min(266px,74vw);max-height:min(288px,40vh);overflow-y:auto;
+  width:min(258px,72vw);max-height:min(240px,32vh);overflow-y:auto;
   display:flex;flex-direction:column;gap:7px;align-items:stretch;
   padding:12px 11px;border-radius:6px;
   background:rgba(8,16,11,.86);border:1px solid rgba(198,154,60,.4);
@@ -720,19 +728,13 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #table .play, #table .pile__hint{cursor:pointer}
 
 #table /* ---------- ring ---------- */
-.ring{flex:1;min-height:0;position:relative;margin-top:4px}
+.ring{flex:1;min-height:0;position:static;margin-top:4px}
 #table .stage{position:absolute;inset:0}
-#table .plane{position:absolute;left:0;right:0;top:19%;bottom:13%;transform-style:preserve-3d;
+#table .plane{position:absolute;left:0;right:0;top:0;bottom:0;transform-style:preserve-3d;
   transition:transform .5s cubic-bezier(.3,.7,.3,1)}
-#table .felt{
-  position:absolute;left:2%;right:2%;top:2%;bottom:2%;border-radius:50%;
-  background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
-  box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4);
-}
-#table .felt::after{content:"";position:absolute;inset:0;border-radius:50%;
-  background:repeating-linear-gradient(51deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px)}
+#table .felt{display:none}   #table /* 바닥은 배경 그림이 대신한다 */
 
-#table .seat{position:absolute;width:76px;
+.seat{position:absolute;width:76px;
   display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6;
   transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
 #table .seat{transform:translate(-50%,-50%)}
@@ -757,7 +759,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   background:rgba(10,16,12,.92);border:1px solid var(--gold-dim);color:var(--gold-hi);white-space:nowrap}
 
 #table /* ---------- pile in the middle ---------- */
-.pile{position:absolute;left:50%;top:50%;width:0;height:0;z-index:4;transform-style:preserve-3d}
+.pile{position:absolute;left:49%;top:50.5%;width:0;height:0;z-index:4;transform-style:preserve-3d}
 #table #seats{position:absolute;inset:0;transform-style:preserve-3d}
 #table .play{position:absolute;left:0;top:0;display:flex;gap:4px;transform-style:preserve-3d;
   transform:translate(-50%,calc(-50% + var(--dy,0px))) rotate(var(--r,0deg)) scale(var(--sc,1))}
@@ -767,8 +769,8 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 #table .play--old{filter:brightness(.5) saturate(.7)}
 
-#table .pile__hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);backface-visibility:hidden;
-  width:150px;text-align:center;font-size:12px;color:#83A08D;line-height:1.7;
+#table .pile__hint{position:absolute;left:49%;top:50.5%;transform:translate(-50%,-50%);backface-visibility:hidden;
+  width:132px;text-align:center;font-size:11.5px;color:#83A08D;line-height:1.65;
   border:1px dashed rgba(198,154,60,.3);border-radius:5px;padding:16px 10px}
 
 #table /* ---------- card ---------- */
@@ -794,20 +796,20 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #table .card__art img{width:100%;height:100%;object-fit:cover;display:block}
 
 #table /* ---------- hand ---------- */
-.need{text-align:center;font-size:11.5px;color:#A9C0B0;margin:2px 0 5px;min-height:16px}
+.need{position:relative;z-index:2;text-align:center;font-size:11.5px;color:#A9C0B0;margin:2px 0 5px;min-height:16px}
 #table .need b{color:var(--gold-hi);font-weight:400}
 #table .timer{height:3px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:8px}
 #table .timer i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-hi),var(--gold));
   transform-origin:left;animation:tick 15s linear forwards}
 @keyframes tick{from{transform:scaleX(1)}to{transform:scaleX(0)}}
-#table .hand{position:relative;height:126px;margin-bottom:9px}
+#table .hand{position:relative;z-index:2;height:126px;margin-bottom:9px}
 #table .hand .slot{position:absolute;bottom:0;transition:transform .16s ease}
 #table .hand .card{--w:60px}
 #table .hand .card__name{display:none}
 #table .slot--sel{transform:translateY(-20px)}
 #table .slot--sel .card{box-shadow:0 0 0 2px var(--gold-hi),0 10px 18px rgba(0,0,0,.6)}
 #table .slot--dead .card{filter:brightness(.44) saturate(.5)}
-#table .acts{display:flex;gap:9px}
+#table .acts{position:relative;z-index:2;display:flex;gap:9px}
 #table .acts button{flex:1;padding:14px;border-radius:2px;
   font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;letter-spacing:.05em}
 #table .bt-pass{border:1px solid var(--gold-dim);color:var(--parchment-dim)}
@@ -849,6 +851,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 <section class="page" id="lobby">
 
+<div class="veil"></div>
 <main class="screen">
   <div class="bar"><button class="navback" data-back="entry" aria-label="뒤로">‹</button>
     <div class="mark" id="mark"></div>
@@ -1002,6 +1005,10 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 <section class="page" id="result">
 
 <main class="screen">
+  <div class="lang" id="lang">
+    <button data-l="ko" aria-pressed="true">한</button>
+    <button data-l="en" aria-pressed="false">EN</button>
+  </div>
   <div class="head">
     <div class="head__k" id="kicker"></div>
     <div class="head__t" id="title"></div>
@@ -1020,7 +1027,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 <main class="screen">
   <div class="bar">
-    <div style="display:flex;align-items:center;gap:9px"><button class="bar__x" data-back="lobby" aria-label="나가기">✕</button><button id="endRound" style="font-size:10.5px;letter-spacing:.04em;color:#8FA898;border:1px solid #2E4436;border-radius:2px;padding:4px 8px;background:none;cursor:pointer">판 종료</button></div>
+    <div style="display:flex;align-items:center;gap:9px"><button class="bar__x" data-back="lobby" aria-label="나가기">✕</button><button id="endRound" style="font-size:10.5px;letter-spacing:.04em;color:#8FA898;border:1px solid #2E4436;border-radius:2px;padding:4px 8px;background:none;cursor:pointer"></button></div>
     <div class="bar__r" id="round"></div>
     <div style="display:flex;align-items:center;gap:9px">
       <div class="lang" id="lang">
@@ -1070,7 +1077,7 @@ const T = {
   ko:{eyebrow:"ZOO PRESIDENT", wordmark:"동물의 왕국", sub:"계급 카드게임", start:"게임 시작"},
   en:{eyebrow:"CARD CLASH", wordmark:"Zoo President", sub:"Climbing card game", start:"Start game"}
 };
-let lang = "ko";
+let lang = window.__lang || "ko";
 
 const fan = document.getElementById("fan");
 function renderFan(){
@@ -1130,6 +1137,8 @@ document.querySelectorAll("#lang button").forEach(b => {
     apply();
   });
 });
+
+window.addEventListener("langchange", () => { lang = window.__lang; apply(); });
 </script>
 
 <script>
@@ -1189,7 +1198,7 @@ const T = {
     joker:["Chameleon","Played alongside other cards it becomes that card — two 5s plus a chameleon makes three 5s. Played alone it counts as 13, the weakest card. Two are in the deck."]
   }
 };
-let lang = "ko";
+let lang = window.__lang || "ko";
 
 function miniCard(key, num, name){
   return '<div class="card">' +
@@ -1253,6 +1262,8 @@ document.getElementById("code").addEventListener("input", e => {
   e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4);
 });
 
+window.addEventListener("langchange", () => { lang = window.__lang; render(); });
+
 })();
 (function(){
 const __r = window.document.getElementById("draw");
@@ -1294,7 +1305,7 @@ const T = {
        note:"The first round has no ranks and no tax.",
        go:"Start round", picking:"Choosing" }
 };
-let lang = "ko";
+let lang = window.__lang || "ko";
 let N = 6;
 const nameOf = i => (lang === "ko" ? NAMES_KO : NAMES_EN)[i];
 const art = n => n === 13 ? ART.jokerA : n === 14 ? ART.jokerB : ART[String(n).padStart(2,"0")];
@@ -1449,7 +1460,7 @@ function boot(){
   drawn = Array(N).fill(null);
   pickOrder = [];
   window.__roundNo = 1;
-  window.__myRank = null;
+  window.__myRankIdx = null;
   window.GAME = {N: N, roundNo: 1, score: Array(N).fill(0), order: null, finish: null, hold: null};
   phase = "pick";
   layout(Array.from({length: N}, (_, i) => i));
@@ -1467,6 +1478,8 @@ document.querySelectorAll("#lang button").forEach(b => {
   });
 });
 window.addEventListener("resize", draw);
+
+window.addEventListener("langchange", () => { lang = window.__lang; draw(); });
 
 })();
 (function(){
@@ -1517,7 +1530,7 @@ const L = {
        start:"Start", needFour:"Four players are needed",
        wait:"Waiting for the host to start" }
 };
-let lang = "ko";
+let lang = window.__lang || "ko";
 const PLAYERS = PLAYERS_KO;
 let cap = 6;          // 방 인원
 let joined = 4;       // 들어온 사람
@@ -1644,6 +1657,8 @@ setInterval(() => {
   draw();
 }, 3400);
 
+window.addEventListener("langchange", () => { lang = window.__lang; draw(); });
+
 })();
 (function(){
 const __r = window.document.getElementById("tax");
@@ -1657,7 +1672,7 @@ const document = {
   addEventListener: (...a) => window.document.addEventListener(...a)
 };
 
-const ART = {"01": "assets/card_01.webp", "02": "assets/card_02.webp", "03": "assets/card_03.webp", "04": "assets/card_04.webp", "05": "assets/card_05.webp", "06": "assets/card_06.webp", "07": "assets/card_07.webp", "08": "assets/card_08.webp", "09": "assets/card_09.webp", "10": "assets/card_10.webp", "11": "assets/card_11.webp", "12": "assets/card_12.webp", "jokerA": "assets/joker_a.webp", "jokerB": "assets/joker_b.webp"}, HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.webp", "assets/head_10.webp", "assets/head_06.webp", "assets/head_09.webp", "assets/head_07.webp", "assets/head_12.webp"];
+const ART = {"01": "assets/card_01.webp", "02": "assets/card_02.webp", "03": "assets/card_03.webp", "04": "assets/card_04.webp", "05": "assets/card_05.webp", "06": "assets/card_06.webp", "07": "assets/card_07.webp", "08": "assets/card_08.webp", "09": "assets/card_09.webp", "10": "assets/card_10.webp", "11": "assets/card_11.webp", "12": "assets/card_12.webp", "jokerA": "assets/joker_a.webp", "jokerB": "assets/joker_b.webp", "back": "assets/back.webp"}, HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.webp", "assets/head_10.webp", "assets/head_06.webp", "assets/head_09.webp", "assets/head_07.webp", "assets/head_12.webp"];
 const el = id => document.getElementById(id);
 const isJ = c => c >= 13;
 
@@ -1665,9 +1680,9 @@ const KO_N = ["사자","호랑이","불곰","코끼리","악어","여우","기�
 const EN_N = ["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"];
 const T = {
   ko:{
-    steps:["계급 발표","패 나누기","혁명","세금","시작"],
+    steps:["등수 발표","패 나누기","혁명","세금","시작"],
     dealH:"패 나누기", dealS:"80장을 골고루 나눕니다. 이 순간 카멜레온 두 장이 한 사람에게 몰리면 혁명이 열립니다.",
-    rankH:"이번 판의 계급", rankS:"손을 턴 순서가 그대로 계급이 됩니다. 위에서부터 사자·호랑이, 아래에서부터 생쥐·새 순입니다.",
+    rankH:"이번 판의 등수", rankS:"지난 판에서 손을 턴 순서가 그대로 이번 판 등수가 됩니다.",
     revH:"혁명", revNone:"카멜레온 두 장을 모두 쥔 사람이 없습니다.",
     revMine:"카멜레온 두 장이 모두 손에 들어왔습니다. 혁명을 선언하면 이번 판 세금이 사라집니다.",
     revOther:n=>n+"님이 카멜레온 두 장을 쥐고 혁명을 선언했습니다. 이번 판 세금은 없습니다.",
@@ -1687,9 +1702,9 @@ const T = {
     joker:"카멜레온"
   },
   en:{
-    steps:["Ranks","Deal","Revolution","Tax","Start"],
+    steps:["Standings","Deal","Revolution","Tax","Start"],
     dealH:"Dealing", dealS:"All 80 cards go out. If both chameleons land in one hand, a revolution opens up.",
-    rankH:"Ranks for this round", rankS:"Finishing order becomes rank — Lion and Tiger from the top, Mouse and Bird from the bottom.",
+    rankH:"Standings for this round", rankS:"Last round's finishing order becomes this round's standing.",
     revH:"Revolution", revNone:"Nobody holds both chameleons.",
     revMine:"Both chameleons are in your hand. Declare a revolution and this round's tax is cancelled.",
     revOther:n=>n+" holds both chameleons and declared a revolution. No tax this round.",
@@ -1715,7 +1730,7 @@ const G = () => (window.GAME = window.GAME || {});
 const holds = () => G().hold || [];
 const myHand = () => holds()[0] || [];
 
-const nameOf = i => (G().names || [])[i] || "";
+const nameOf = i => ((lang === "ko" ? G().names : G().namesEn) || G().names || [])[i] || "";
 
 
 const art = n => n === 13 ? ART.jokerA : n === 14 ? ART.jokerB : ART[String(n).padStart(2,"0")];
@@ -1735,10 +1750,12 @@ function cardHTML(n, w){
 function order(){ return reversed ? ranks.slice().reverse() : ranks; }
 function rankOf(seat){ return order().indexOf(seat); }
 /* 계급 호칭 = 덱 순서. 위에서부터 사자·호랑이·…, 아래에서부터 생쥐·새·… */
-function rankName(r){
-  const N = lang === "ko" ? KO_N : EN_N, n = order().length;
-  return r < n / 2 ? N[r] : N[11 - (n - 1 - r)];
+function ordEn(n){
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
+function rankLabel(r){ return lang === "ko" ? (r + 1) + "등" : ordEn(r + 1); }
+
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
   return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
@@ -1834,7 +1851,7 @@ function renderSeats(){
       (step >= 1 && r <= 1 ? " seat--top" : "") + (step >= 1 && r >= n - 2 ? " seat--bot" : "");
     d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
     d.innerHTML =
-      '<span class="seat__r' + (step >= 1 ? " on" : "") + '">' + rankName(r) + '</span>' +
+      '<span class="seat__r' + (step >= 1 ? " on" : "") + '">' + rankLabel(r) + '</span>' +
       '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
       '<span class="seat__n">' + nameOf(i) + '</span>';
     box.appendChild(d);
@@ -1946,7 +1963,7 @@ function renderBottom(){
 
 function draw(){
   renderSeats(); renderMid(); renderHand(); renderBottom();
-  if (step >= 1) window.__myRank = rankName(rankOf(0));
+  if (step >= 1) window.__myRankIdx = rankOf(0);
 }
 
 function boot(){
@@ -1999,6 +2016,8 @@ document.querySelectorAll("#lang button").forEach(b => {
 });
 window.addEventListener("resize", draw);
 
+window.addEventListener("langchange", () => { lang = window.__lang; draw(); });
+
 })();
 (function(){
 const __r = window.document.getElementById("result");
@@ -2034,17 +2053,18 @@ const T = {
        next:"Next round", nextF:"Play again", quit:"Leave",
        tie:"Tied on points. More Lion finishes ranks higher." }
 };
-let lang = "ko";
+let lang = window.__lang || "ko";
 
-function rankName(r, n){
-  const N = lang === "ko" ? KO_N : EN_N;
-  return r < n / 2 ? N[r] : N[11 - (n - 1 - r)];
+function ordEn(n){
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
+function rankLabel(r){ return lang === "ko" ? (r + 1) + "등" : ordEn(r + 1); }
 
 function render(){
   const G = window.GAME || {};
   const n = G.N || 6;
-  const names = G.names || [];
+  const names = (lang === "ko" ? G.names : G.namesEn) || G.names || [];
   const finish = G.finish || [];
   const score = G.score || [];
   const rounds = (window.__opts && window.__opts.rounds) || 5;
@@ -2073,7 +2093,7 @@ function render(){
       '<span class="row__p">' + (idx + 1) + '</span>' +
       '<img class="row__av" src="' + HEADS[seat % HEADS.length] + '" alt="">' +
       '<span class="row__n">' + (names[seat] || "") + '</span>' +
-      '<span class="row__r">' + rankName(place, n) + '</span>' +
+      '<span class="row__r">' + rankLabel(place) + '</span>' +
       '<span class="row__g">+' + gained + '</span>' +
       '<span class="row__t">' + (score[seat] || 0) + '</span></div>';
   }).join("");
@@ -2083,6 +2103,8 @@ function render(){
 }
 window.__bootResult = render;
 render();
+
+window.addEventListener("langchange", () => { lang = window.__lang; render(); });
 
 })();
 (function(){
@@ -2110,28 +2132,29 @@ const T = {
        pass:"패스", pick:"카드를 고르세요", play:n=>n+"장 내기",
        notTurn:"상대 차례입니다", mix:"같은 숫자만 함께 낼 수 있습니다",
        cnt:n=>n+"장을 맞춰 주세요", lower:"더 낮은 숫자를 내세요",
-       autoPass:"시간 초과 · 자동 패스", cleared:"2번 · 판을 엎었습니다",
+       autoPass:"시간 초과 · 자동 패스", cleared:"2번 · 판을 엎었습니다", endR:"판 종료",
        close:"다시 누르면 접힙니다" },
 
   en:{ roundN:n=>"Round "+n, joker:"CHAMELEON",
        myTurn:"Your turn", theirTurn:n=>n+"'s turn",
        left:c=>'<b>'+c+'</b> left', tagTurn:"turn", tagPass:"passed", tagOut:"done",
        lead:"Lead with any number of cards", top1:'<b>1</b> is out. Nobody can beat it',
-       need:(c,n)=>'Beat with <b>'+c+' cards</b> of <b>'+n+' or lower</b>',
+       need:(c,n)=>'Beat with <b>'+c+(c===1?' card':' cards')+'</b> of <b>'+n+' or lower</b>',
        emptyPile:"The pile is empty<br>Play anything you like",
        pass:"Pass", pick:"Select cards", play:n=>"Play "+n,
        notTurn:"Opponent's turn", mix:"Cards must share one number",
        cnt:n=>"Play exactly "+n, lower:"Play a lower number",
-       autoPass:"Time up · passed", cleared:"A 2 · pile cleared",
+       autoPass:"Time up · passed", cleared:"A 2 · pile cleared", endR:"End round",
        close:"Tap again to close" }
 };
-let lang = "ko";
+let lang = window.__lang || "ko";
 const NAMES = KO_N;
 const el = id => document.getElementById(id);
 const isJ = c => c >= 13;   // 카멜레온 2장: 13=광대, 14=신사
 
 /* 0번이 나. 시계 방향으로 상대 */
 const ALL = ["나","민지","준호","서연","태윤","하은","지훈","예린"];
+const ALL_EN = ["You","Minji","Junho","Seoyeon","Taeyun","Haeun","Jihoon","Yerin"];
 let SEATS = ALL.slice(0, 6).map(n => ({n: n, c: 0, s: ""}));
 
 /* 80장 덱: 1번 1장 ~ 12번 12장 + 카멜레온 2장 */
@@ -2177,7 +2200,8 @@ function boot(fresh){
 function syncGame(){
   window.GAME = window.GAME || {};
   window.GAME.N = SEATS.length;
-  window.GAME.names = SEATS.map(s => s.n);
+  window.GAME.names = ALL.slice(0, SEATS.length);
+  window.GAME.namesEn = ALL_EN.slice(0, SEATS.length);
   window.GAME.hold = SEATS.map(s => s.hold.slice());
 }
 window.__bootTable = boot;
@@ -2214,9 +2238,11 @@ function cardHTML(n, w){
     '<span class="card__num">' + n + '</span></div></div>';
 }
 
+/* 배경 그림의 초록 타원 (화면 기준 x 17~81%, y 40~65%) 바로 바깥에 앉힌다 */
+const RING = {cx: 49, cy: 50.5, rx: 36, ry: 16};
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / SEATS.length);
-  return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
+  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
 }
 
 function maxCount(n){
@@ -2260,10 +2286,11 @@ function renderSeats(){
       (s.s === "pass" ? " seat--pass" : "") + (s.c === 0 ? " seat--out" : "");
     d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
     d.style.zIndex = 6 + Math.round(p.y);
-    const tag = s.c === 0 ? "완주" : turn === i ? "차례" : s.s === "pass" ? "패스" : "";
+    const tg = T[lang];
+    const tag = s.c === 0 ? tg.tagOut : turn === i ? tg.tagTurn : s.s === "pass" ? tg.tagPass : "";
     d.innerHTML = (tag ? '<span class="seat__tag">' + tag + '</span>' : '') +
       '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
-      '<span class="seat__n">' + s.n + '</span>' +
+      '<span class="seat__n">' + (lang === "ko" ? ALL : ALL_EN)[i] + '</span>' +
       (i === 0 ? '' : fanHTML(s.c)) +
       '<span class="seat__c">' + T[lang].left(s.c) + '</span>';
     box.appendChild(d);
@@ -2278,7 +2305,7 @@ function renderPile(){
     const cw = Math.max(18, Math.min(32, Math.floor((196 - (maxC - 1) * 3) / maxC)));
     p.innerHTML = '<div class="spread">' + trick.slice().reverse().map((x, idx) =>
       '<div class="srow' + (idx === 0 ? ' srow--new' : '') + '">' +
-        '<span class="srow__w">' + SEATS[x.by].n + '</span>' +
+        '<span class="srow__w">' + (lang === "ko" ? ALL : ALL_EN)[x.by] + '</span>' +
         '<span class="srow__c">' +
           (x.cards || Array.from({length: x.count}, () => x.num))
             .slice(0, 6).map(cc => cardHTML(cc, cw, isJ(cc) ? x.num : null)).join("") +
@@ -2293,19 +2320,20 @@ function renderPile(){
     return;
   }
   const rect = el("ring").getBoundingClientRect();
-  trick.forEach((t, k) => {
+  trick.slice(-4).forEach((t, kk) => {
+    const k = trick.length - Math.min(trick.length, 4) + kk;
     const from = seatPos(t.by);
     const g = document.createElement("div");
     g.className = "play" + (k < trick.length - 1 ? " play--old" : "") +
       (k >= animated ? " play--new" : "");
     const d = trick.length - 1 - k;
     g.style.setProperty("--r", d === 0 ? "0deg" : (((k * 37) % 19) - 9 - d * 3) + "deg");
-    g.style.setProperty("--dy", (-d * 13) + "px");
-    g.style.setProperty("--sc", (1 - d * 0.07).toFixed(3));
+    g.style.setProperty("--dy", (-Math.min(d, 3) * 6) + "px");
+    g.style.setProperty("--sc", (1 - Math.min(d, 3) * 0.05).toFixed(3));
     g.style.setProperty("--fx", ((from.x - 50) / 100 * rect.width).toFixed(0) + "px");
     g.style.setProperty("--fy", ((from.y - 50) / 100 * rect.height).toFixed(0) + "px");
     g.style.zIndex = k;
-    const cw = Math.max(20, Math.min(52, Math.floor((rect.width * 0.56 - (t.count - 1) * 4) / t.count)));
+    const cw = Math.max(18, Math.min(44, Math.floor((rect.width * 0.44 - (t.count - 1) * 4) / t.count)));
     g.innerHTML = (t.cards || Array.from({length: t.count}, () => t.num))
       .map(cc => cardHTML(cc, cw, isJ(cc) ? t.num : null)).join("");
     p.appendChild(g);
@@ -2334,12 +2362,18 @@ function renderHand(){
 function renderBottom(){
   const c = cur();
   const t = T[lang];
-  el("need").innerHTML = c
+  const who = turn === 0 ? "" : t.theirTurn((lang === "ko" ? ALL : ALL_EN)[turn]) + " \u00B7 ";
+  el("need").innerHTML = who + (c
     ? (c.num === 1 ? t.top1 : t.need(c.count, c.num - 1))
-    : (turn === 0 ? t.lead : "");
-  el("phase").textContent = turn === 0 ? t.myTurn : t.theirTurn(SEATS[turn].n);
+    : (turn === 0 ? t.lead : ""));
+
   const rn = window.__roundNo || 1;
-  el("round").textContent = t.roundN(rn) + (window.__myRank ? " · " + window.__myRank : "");
+  const NM = lang === "ko" ? KO_N : EN_N;
+  const ri = window.__myRankIdx;
+  const ord = x => { const s = ["th","st","nd","rd"], v = x % 100; return x + (s[(v-20)%10] || s[v] || s[0]); };
+  const rname = (ri == null) ? "" : (lang === "ko" ? (ri + 1) + "등" : ord(ri + 1));
+  el("round").textContent = t.roundN(rn) + (rname ? " · " + rname : "");
+  const eb = el("endRound"); if (eb) eb.textContent = t.endR;
   el("pass").textContent = t.pass;
   const list = sel.map(i => hand[i]);
   const ok = legal(list) && turn === 0 && !busy;
@@ -2505,7 +2539,23 @@ document.querySelectorAll("#lang button").forEach(b => {
 draw(); resetTimer();
 window.addEventListener("resize", draw);
 
+window.addEventListener("langchange", () => { lang = window.__lang; draw(); });
+
 })();
+
+/* 언어는 앱 전체가 하나로 움직인다 */
+window.__lang = window.__lang || "ko";
+window.setLang = l => {
+  window.__lang = l;
+  document.documentElement.lang = l;
+  document.querySelectorAll("[data-l]").forEach(b =>
+    b.setAttribute("aria-pressed", String(b.dataset.l === l)));
+  window.dispatchEvent(new Event("langchange"));
+};
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-l]");
+  if (b) window.setLang(b.dataset.l);
+});
 
 function go(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("is-on"));
