@@ -180,7 +180,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 #lobby /* ---------- header ---------- */
 .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-#lobby .mark{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.03em}
+#lobby .mark{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.03em;text-shadow:0 2px 6px rgba(0,0,0,.9)}
 #lobby body[data-lang="en"] .mark{font-family:"Playfair Display",serif;font-size:18px}
 #lobby .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
 #lobby .lang button{padding:5px 10px;font-size:11px;letter-spacing:.08em;color:var(--parchment-dim)}
@@ -188,7 +188,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 #lobby /* ---------- body ---------- */
 .body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:22px}
-#lobby .block__label{
+#lobby .block__label{text-shadow:0 1px 4px rgba(0,0,0,.9);
   font-family:"Noto Serif KR",serif;font-weight:600;
   font-size:11px;letter-spacing:.28em;text-indent:.28em;color:var(--gold);
   margin-bottom:9px;
@@ -209,7 +209,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 #lobby body[data-lang="en"] .btn-primary, #lobby body[data-lang="en"] .btn-second{font-family:"Playfair Display",serif;letter-spacing:.08em}
 #lobby .btn-primary:active, #lobby .btn-second:active{transform:translateY(1px)}
-#lobby .hint{font-size:12px;color:#8E8064;margin-top:8px;line-height:1.65}
+#lobby .hint{font-size:12px;color:#B0A283;text-shadow:0 1px 4px rgba(0,0,0,.95);margin-top:8px;line-height:1.65}
 
 #lobby .join{display:flex;gap:9px}
 #lobby .join input{
@@ -310,7 +310,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 *{box-sizing:border-box;margin:0;padding:0}
 #draw, #draw{height:100%}
-#draw{background:radial-gradient(96% 44% at 50% 34%,#2E5540,#16291F 54%,#0B140F);
+#draw{background:#0B140F url(assets/tablebg.webp) center/cover no-repeat;
   color:var(--parchment);font-family:"Gowun Dodum",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overflow:hidden}
 #draw button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
@@ -324,22 +324,19 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #draw .lang button{padding:4px 8px;font-size:10px;color:var(--parchment-dim)}
 #draw .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
 
-#draw .ring{height:66%;flex:none;position:relative;margin-top:4px}
-#draw .plane{position:absolute;left:0;right:0;top:19%;bottom:13%}
+#draw .ring{height:66%;flex:none;position:static;margin-top:4px}
+#draw .plane{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none}
 #draw .pad{flex:1;min-height:0}
-#draw .felt{position:absolute;left:14%;right:14%;top:10%;bottom:10%;border-radius:50%;
-  background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
-  box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4)}
-
-#draw .seat{position:absolute;width:74px;transform:translate(-50%,-50%);
+#draw .felt{display:none}
+#draw .seat{--av:42px;--fs:10.5px;position:absolute;width:calc(var(--av,44px) + 32px);transform:translate(-50%,-50%);
   display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6}
-#draw .seat__av{width:42px;height:42px;border-radius:50%;object-fit:cover;
+#draw .seat__av{width:var(--av,44px);height:var(--av,44px);border-radius:50%;object-fit:cover;
   border:2px solid rgba(198,154,60,.55);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6);
   transition:border-color .3s ease}
-#draw .seat--me .seat__av{width:46px;height:46px;border-color:#E3C67C}
+#draw .seat--me .seat__av{width:calc(var(--av,44px) + 4px);height:calc(var(--av,44px) + 4px);border-color:#E3C67C}
 #draw .seat--turn .seat__av{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(227,198,124,.3),0 3px 9px rgba(0,0,0,.6)}
 #draw .seat--tie .seat__av{border-color:#E36C4C;box-shadow:0 0 0 3px rgba(227,108,76,.3)}
-#draw .seat__n{font-size:10.5px;line-height:1.2;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#draw .seat__n{font-size:var(--fs,10.5px);line-height:1.2;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9)}
 #draw .seat__d{font-family:"Noto Serif KR",serif;font-weight:900;font-size:11px;
   color:#120C07;background:linear-gradient(180deg,#E3C67C,#B08A34);
   padding:1px 8px;border-radius:8px;line-height:16px;
@@ -351,7 +348,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #draw .seat__r.on{opacity:1;transform:none}
 
 #draw /* 바닥에 깔린 뽑을 카드 */
-.deck{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);
+.deck{pointer-events:auto;position:absolute;left:49%;top:44%;transform:translate(-50%,-50%);
   display:grid;grid-template-columns:repeat(var(--cols,4),var(--pw,44px));
   gap:9px;justify-content:center;z-index:5;--pw:34px}
 #draw .pk{width:var(--pw,34px);aspect-ratio:200/390;perspective:600px;cursor:pointer;
@@ -379,7 +376,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #draw .card__art{flex:1;min-height:0;border:1px solid var(--gold-dim);background:#1A1410;overflow:hidden}
 #draw .card__art img{width:100%;height:100%;object-fit:cover;display:block}
 
-#draw .mid{margin:6px auto 0;width:min(300px,88%);text-align:center;flex:none}
+#draw .mid{position:relative;z-index:2;margin:6px auto 0;width:min(300px,88%);text-align:center;flex:none}
 #draw .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;margin-bottom:6px}
 #draw .mid__s{font-size:12.5px;color:#A9C0B0;line-height:1.7}
 #draw .mid__s b{color:var(--gold-hi);font-weight:400}
@@ -401,9 +398,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 *{box-sizing:border-box;margin:0;padding:0}
 #room, #room{height:100%}
 #room{
-  background:
-    radial-gradient(110% 46% at 50% 0%,rgba(122,34,38,.36),transparent 62%),
-    var(--ink);
+  background:var(--ink) url(assets/tablebg.webp) center/cover no-repeat;
   color:var(--parchment);
   font-family:"Gowun Dodum",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overflow:hidden;
@@ -411,7 +406,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 #room :focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
 
-#room .screen{
+#room .screen{position:relative;z-index:1;
   height:100%;display:flex;flex-direction:column;overflow-y:auto;
   padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);
 }
@@ -440,9 +435,9 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 
 #room /* ---------- table ---------- */
-.tablewrap{flex:1;min-height:240px;position:relative;margin:14px 0 12px}
+.tablewrap{flex:1;min-height:250px;position:relative;margin:14px 0 12px}
 #room .felt{
-  position:absolute;left:20%;right:20%;top:20%;bottom:20%;
+  position:absolute;left:14%;right:14%;top:10%;bottom:10%;
   border-radius:50%;
   background:radial-gradient(72% 60% at 50% 34%,#3A6A52,var(--felt-1) 46%,var(--felt-2));
   box-shadow:0 0 0 5px rgba(80,58,22,.72),0 0 0 7px rgba(198,154,60,.34),0 18px 40px rgba(0,0,0,.6);
@@ -464,7 +459,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   text-align:center;
 }
 #room .seat__av{
-  width:46px;height:46px;border-radius:50%;
+  width:var(--av,44px);height:var(--av,44px);border-radius:50%;
   border:2px solid var(--gold);object-fit:cover;background:#241A12;
   box-shadow:0 3px 10px rgba(0,0,0,.6);
 }
@@ -474,7 +469,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   display:flex;align-items:center;justify-content:center;
   color:rgba(198,154,60,.55);font-size:17px;
 }
-#room .seat__n{font-size:11px;line-height:1.2;color:var(--parchment);white-space:nowrap;max-width:66px;overflow:hidden;text-overflow:ellipsis}
+#room .seat__n{font-size:var(--fs,10.5px);line-height:1.2;color:var(--parchment);white-space:nowrap;max-width:66px;overflow:hidden;text-overflow:ellipsis}
 #room .seat--empty .seat__n{color:#7B6C50}
 #room .seat__b{
   font-size:9px;letter-spacing:.1em;color:#120C07;
@@ -521,6 +516,9 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .dots::after{content:"";animation:dots 1.4s steps(4,end) infinite}
 @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
+#room .veil{position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,10,7,.5),rgba(6,10,7,.42) 34%,rgba(5,8,6,.88))}
+
 
 #tax{
   --card-ink:#3B2A12; --card-ink-2:#5A431C;
@@ -530,7 +528,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 *{box-sizing:border-box;margin:0;padding:0}
 #tax, #tax{height:100%}
-#tax{background:radial-gradient(96% 44% at 50% 34%,#2E5540,#16291F 54%,#0B140F);
+#tax{background:#0B140F url(assets/tablebg.webp) center/cover no-repeat;
   color:var(--parchment);font-family:"Gowun Dodum",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overflow:hidden}
 #tax button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
@@ -547,40 +545,37 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #tax .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
 
 #tax /* ring */
-.ring{flex:1;min-height:0;position:relative;margin-top:6px}
+.ring{flex:1;min-height:0;position:static;margin-top:6px}
 #tax .plane{position:absolute;left:0;right:0;top:15%;bottom:11%}
-#tax .felt{position:absolute;left:14%;right:14%;top:10%;bottom:10%;border-radius:50%;
-  background:radial-gradient(70% 56% at 50% 32%,#3A6A52,#2A4E3B 48%,#16291F);
-  box-shadow:0 0 0 4px rgba(80,58,22,.6),0 0 0 6px rgba(198,154,60,.26),inset 0 0 60px rgba(0,0,0,.4)}
-#tax .seat{position:absolute;width:78px;transform:translate(-50%,-50%);
-  display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6}
-#tax .seat__av{width:44px;height:44px;border-radius:50%;object-fit:cover;
-  border:2px solid rgba(198,154,60,.6);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6);
-  transition:border-color .3s ease,transform .45s cubic-bezier(.3,.8,.3,1)}
-#tax .seat--me .seat__av{width:48px;height:48px;border-color:#E3C67C}
-#tax .seat--top .seat__av{border-color:#E3C67C;box-shadow:0 0 0 3px rgba(227,198,124,.34),0 3px 9px rgba(0,0,0,.6)}
-#tax .seat--bot .seat__av{border-color:#6E8A76;filter:saturate(.7) brightness(.86)}
-#tax .seat__n{font-size:10.5px;line-height:1.2;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9)}
-#tax .seat__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:10.5px;
-  padding:1px 7px;border-radius:2px;white-space:nowrap;
-  background:rgba(10,16,12,.9);border:1px solid var(--gold-dim);color:var(--gold-hi);
-  opacity:0;transform:translateY(-4px);transition:opacity .3s ease,transform .3s ease}
-#tax .seat__r.on{opacity:1;transform:none}
-#tax .seat--bot .seat__r{color:#A9C0B0;border-color:#3E5548}
-#tax .flip .seat__av{transform:rotate(360deg) scale(1.12)}
-
-#tax /* centre panel */
-.fx{position:absolute;inset:0;pointer-events:none;z-index:9}
+#tax .felt{display:none}
+#tax .fx{position:absolute;inset:0;pointer-events:none;z-index:9}
 #tax .fly{position:absolute;transition:left .5s cubic-bezier(.25,.8,.3,1),top .5s cubic-bezier(.25,.8,.3,1),transform .5s cubic-bezier(.25,.8,.3,1),opacity .3s ease}
 #tax .fly .card{--w:32px}
 #tax .flash{position:absolute;inset:-20%;pointer-events:none;z-index:10;opacity:0;
   background:radial-gradient(closest-side,rgba(255,232,170,.75),rgba(227,198,124,.2) 46%,transparent 70%)}
 #tax .flash.go{animation:burst .85s ease-out}
 @keyframes burst{0%{opacity:0;transform:scale(.5)}22%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+
+#tax .seat{--av:44px;--fs:10.5px;position:absolute;width:calc(var(--av,44px) + 34px);
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6}
+#tax .seat__av{width:var(--av,44px);height:var(--av,44px);border-radius:50%;object-fit:cover;
+  border:2px solid rgba(198,154,60,.6);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6);
+  transition:border-color .3s ease}
+#tax .seat--me .seat__av{width:calc(var(--av,44px) + 4px);height:calc(var(--av,44px) + 4px);border-color:#E3C67C}
+#tax .seat--top .seat__av{border-color:#E3C67C;box-shadow:0 0 0 3px rgba(227,198,124,.34),0 3px 9px rgba(0,0,0,.6)}
+#tax .seat--bot .seat__av{border-color:#6E8A76;filter:saturate(.7) brightness(.86)}
+#tax .seat__n{font-size:var(--fs,10.5px);line-height:1.2;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+#tax .seat__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:calc(var(--fs,10.5px) - .5px);
+  padding:1px 7px;border-radius:2px;white-space:nowrap;
+  background:rgba(10,16,12,.9);border:1px solid var(--gold-dim);color:var(--gold-hi);
+  opacity:0;transform:translateY(-4px)}
+#tax .seat__r.on{opacity:1;transform:none}
+#tax .seat--bot .seat__r{color:#A9C0B0;border-color:#3E5548}
 #tax .seat__r{transition:opacity .3s ease,transform .3s ease}
 #tax .seat__r.swap{animation:swap .7s ease both}
 @keyframes swap{0%{opacity:1}30%{opacity:0;transform:translateY(6px) scale(.8)}60%{opacity:0;transform:translateY(-6px) scale(.8)}100%{opacity:1;transform:none}}
-#tax .mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+#tax .mid{position:absolute;left:49%;top:44%;transform:translate(-50%,-50%);
   width:min(196px,52%);text-align:center;z-index:8}
 #tax .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;margin-bottom:6px}
 #tax .mid__s{font-size:11.5px;color:#A9C0B0;line-height:1.65}
@@ -725,27 +720,27 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #table .srow--new .srow__w{color:var(--gold-hi)}
 #table .srow--new .srow__c{outline:1px solid rgba(227,198,124,.5);outline-offset:3px;border-radius:3px}
 #table .spread__t{font-size:10.5px;color:#7E9686;text-align:center;padding-top:2px}
-#table .play, #table .pile__hint{cursor:pointer}
+#table .play, #table .pile__hint, #table .spread{pointer-events:auto;cursor:pointer}
 
 #table /* ---------- ring ---------- */
 .ring{flex:1;min-height:0;position:static;margin-top:4px}
 #table .stage{position:absolute;inset:0}
-#table .plane{position:absolute;left:0;right:0;top:0;bottom:0;transform-style:preserve-3d;
+#table .plane{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;transform-style:preserve-3d;
   transition:transform .5s cubic-bezier(.3,.7,.3,1)}
 #table .felt{display:none}   #table /* 바닥은 배경 그림이 대신한다 */
 
-.seat{position:absolute;width:76px;
+.seat{--av:44px;--fs:10.5px;position:absolute;width:calc(var(--av,44px) + 32px);
   display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;z-index:6;
   transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
 #table .seat{transform:translate(-50%,-50%)}
-#table .seat__av{width:44px;height:44px;border-radius:50%;object-fit:cover;
+#table .seat__av{width:var(--av,44px);height:var(--av,44px);border-radius:50%;object-fit:cover;
   border:2px solid rgba(198,154,60,.6);background:#241A12;box-shadow:0 3px 9px rgba(0,0,0,.6)}
 #table .seat--turn .seat__av{border-color:var(--gold-hi);box-shadow:0 0 0 3px rgba(227,198,124,.3),0 3px 9px rgba(0,0,0,.6)}
 #table .seat--pass .seat__av, #table .seat--pass .seat__n{opacity:.36}
 #table .seat--out .seat__av{border-style:dashed;filter:grayscale(1) brightness(.7)}
-#table .seat--me .seat__av{border-color:#E3C67C;width:48px;height:48px}
-#table .seat__n{font-size:10.5px;text-shadow:0 1px 3px rgba(0,0,0,.9);line-height:1.2;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis}
-#table .seat__c{font-size:9.5px;color:#CFE0D4;text-shadow:0 1px 3px rgba(0,0,0,.9);white-space:nowrap}
+#table .seat--me .seat__av{border-color:#E3C67C;width:calc(var(--av,44px) + 4px);height:calc(var(--av,44px) + 4px)}
+#table .seat__n{font-size:var(--fs,10.5px);text-shadow:0 1px 3px rgba(0,0,0,.9);line-height:1.2;white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis}
+#table .seat__c{font-size:calc(var(--fs,10.5px) - 1px);color:#CFE0D4;text-shadow:0 1px 3px rgba(0,0,0,.9);white-space:nowrap}
 #table .seat__c b{font-family:"Noto Serif KR",serif;font-weight:900;color:var(--gold-hi)}
 #table .fan{position:relative;height:22px;margin-top:1px}
 #table .fan i{
@@ -759,7 +754,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   background:rgba(10,16,12,.92);border:1px solid var(--gold-dim);color:var(--gold-hi);white-space:nowrap}
 
 #table /* ---------- pile in the middle ---------- */
-.pile{position:absolute;left:49%;top:50.5%;width:0;height:0;z-index:4;transform-style:preserve-3d}
+.pile{position:absolute;left:49%;top:44%;width:0;height:0;z-index:4;transform-style:preserve-3d}
 #table #seats{position:absolute;inset:0;transform-style:preserve-3d}
 #table .play{position:absolute;left:0;top:0;display:flex;gap:4px;transform-style:preserve-3d;
   transform:translate(-50%,calc(-50% + var(--dy,0px))) rotate(var(--r,0deg)) scale(var(--sc,1))}
@@ -769,7 +764,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 #table .play--old{filter:brightness(.5) saturate(.7)}
 
-#table .pile__hint{position:absolute;left:49%;top:50.5%;transform:translate(-50%,-50%);backface-visibility:hidden;
+#table .pile__hint{position:absolute;left:49%;top:44%;transform:translate(-50%,-50%);backface-visibility:hidden;
   width:132px;text-align:center;font-size:11.5px;color:#83A08D;line-height:1.65;
   border:1px dashed rgba(198,154,60,.3);border-radius:5px;padding:16px 10px}
 
@@ -931,6 +926,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 </section>
 <section class="page" id="room">
 
+<div class="veil"></div>
 <main class="screen">
   <div class="bar">
     <button class="back" data-back="lobby" aria-label="나가기">‹</button>
@@ -1316,9 +1312,10 @@ let pool = [];                     // 바닥에 깔린 카드
 let waiting = [];                  // 아직 안 뽑은 자리 (순서대로)
 let phase = "pick";                // pick | tie | done
 
+const RING = {cx: 49, cy: 44, rx: 36, ry: 16};
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
-  return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
+  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
 }
 function cardFace(c){
   const n = isJ(c) ? 13 : c;
@@ -1423,6 +1420,9 @@ function renderSeats(){
       (waiting[0] === i && phase === "pick" ? " seat--turn" : "") +
       "";
     d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    const big = N <= 6;
+    d.style.setProperty("--av", (big ? 42 : 33) + "px");
+    d.style.setProperty("--fs", (big ? 10.5 : 9) + "px");
     const first = phase === "done" && i === winner();
     const dv = drawn[i] == null ? "" : val(drawn[i]);
     d.innerHTML =
@@ -1545,12 +1545,15 @@ function renderSeats(){
   for (let i = 0; i < cap; i++){
     const a = (Math.PI / 2) + (i * 2 * Math.PI / cap);   // 아래에서 시계 방향
     const left = 50 + Math.cos(a) * -40;
-    const top  = 50 + Math.sin(a) * 40;
+    const top  = 50 + Math.sin(a) * 42;
     const filled = i < joined;
     const el = document.createElement("div");
     el.className = "seat" + (filled ? "" : " seat--empty") + (i === 0 ? " seat--me" : "");
     el.style.left = left.toFixed(2) + "%";
     el.style.top  = top.toFixed(2) + "%";
+    const big = cap <= 6;
+    el.style.setProperty("--av", (big ? 46 : 36) + "px");
+    el.style.setProperty("--fs", (big ? 11 : 9.5) + "px");
     el.innerHTML = filled
       ? '<img class="seat__av" src="' + HEADS[i % HEADS.length] + '" alt="">' +
         '<span class="seat__n">' + (lang === "ko" ? PLAYERS_KO : PLAYERS_EN)[i] + '</span>' +
@@ -1756,9 +1759,10 @@ function ordEn(n){
 }
 function rankLabel(r){ return lang === "ko" ? (r + 1) + "등" : ordEn(r + 1); }
 
+const RING = {cx: 49, cy: 44, rx: 36, ry: 16};
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
-  return {x: 50 + Math.cos(a) * -40, y: 50 + Math.sin(a) * 44};
+  return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
 }
 
 /* from/to: 자리 번호, -1이면 가운데 */
@@ -1850,6 +1854,9 @@ function renderSeats(){
     d.className = "seat" + (i === 0 ? " seat--me" : "") +
       (step >= 1 && r <= 1 ? " seat--top" : "") + (step >= 1 && r >= n - 2 ? " seat--bot" : "");
     d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    const big = N <= 6;
+    d.style.setProperty("--av", (big ? 44 : 34) + "px");
+    d.style.setProperty("--fs", (big ? 10.5 : 9) + "px");
     d.innerHTML =
       '<span class="seat__r' + (step >= 1 ? " on" : "") + '">' + rankLabel(r) + '</span>' +
       '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
@@ -2239,7 +2246,7 @@ function cardHTML(n, w){
 }
 
 /* 배경 그림의 초록 타원 (화면 기준 x 17~81%, y 40~65%) 바로 바깥에 앉힌다 */
-const RING = {cx: 49, cy: 50.5, rx: 36, ry: 16};
+const RING = {cx: 49, cy: 44, rx: 36, ry: 16};
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / SEATS.length);
   return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
@@ -2285,6 +2292,9 @@ function renderSeats(){
       (turn === i && !busy ? " seat--turn" : "") +
       (s.s === "pass" ? " seat--pass" : "") + (s.c === 0 ? " seat--out" : "");
     d.style.left = p.x.toFixed(1) + "%"; d.style.top = p.y.toFixed(1) + "%";
+    const big = SEATS.length <= 6;
+    d.style.setProperty("--av", (big ? 44 : 34) + "px");
+    d.style.setProperty("--fs", (big ? 10.5 : 9) + "px");
     d.style.zIndex = 6 + Math.round(p.y);
     const tg = T[lang];
     const tag = s.c === 0 ? tg.tagOut : turn === i ? tg.tagTurn : s.s === "pass" ? tg.tagPass : "";
