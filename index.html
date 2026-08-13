@@ -143,6 +143,40 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   }
 }
 #stage .bg,#stage .sheet,#stage #flash{position:absolute}
+/* 진입창 토글만 떠 있고 나머지 화면 토글은 제자리에 */
+#lobby .lang,#room .lang,#draw .lang,#tax .lang,#table .lang{position:static;top:auto;right:auto}
+
+/* ---------- 설정 버튼 ---------- */
+.cfgbtn{display:inline-flex;align-items:center;justify-content:center;flex:none;
+  width:30px;height:30px;border:1px solid rgba(198,154,62,.6);border-radius:3px;
+  background:rgba(10,7,3,.45);color:#D9C08A;cursor:pointer;padding:0}
+.cfgbtn:active{transform:translateY(1px)}
+#entry .cfgbtn{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:16px;z-index:20;
+  backdrop-filter:blur(4px)}
+
+/* ---------- 설정 창 ---------- */
+.cfg{position:absolute;inset:0;z-index:60;visibility:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end}
+.cfg.on{visibility:visible}
+.cfg__v{position:absolute;inset:0;background:rgba(4,7,5,.72);opacity:0;transition:opacity .24s ease}
+.cfg.on .cfg__v{opacity:1}
+.cfg__p{position:relative;background:linear-gradient(180deg,#1A130C,#0E0A06);
+  border-top:1px solid var(--gold,#B08A34);border-radius:12px 12px 0 0;
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.3,1);
+  padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+.cfg.on .cfg__p{transform:none}
+.cfg__h{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px 12px;border-bottom:1px solid #2E2417;
+  font-family:"Gowun Batang",serif;font-weight:700;font-size:16px;color:#E9D5AC}
+.cfg__x{font-size:21px;line-height:1;color:#B8A47E;background:none;border:none;cursor:pointer;padding:0 4px}
+.cfg__b{padding:16px 18px 22px}
+.cfg__l{font-size:11px;letter-spacing:.22em;color:#B08A34;margin-bottom:9px}
+.cfg__row{display:flex;gap:8px}
+.cfg__row button{flex:1;padding:13px;border:1px solid #4A3A1E;border-radius:3px;
+  background:rgba(0,0,0,.3);color:#C9B58C;font-size:14px;cursor:pointer}
+.cfg__row button[aria-pressed="true"]{color:#140D04;border-color:#E3C67C;
+  background:linear-gradient(180deg,#E3C67C,#B08A34)}
+.cfg__n{font-size:11.5px;color:#8E8064;line-height:1.6;margin-top:12px}
 .page{display:none}
 .page.is-on{display:block}
 #entry{position:absolute;inset:0;overflow:hidden}
@@ -179,10 +213,12 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 
 #lobby /* ---------- header ---------- */
-.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-#lobby .mark{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.03em;text-shadow:0 2px 6px rgba(0,0,0,.9)}
-#lobby body[data-lang="en"] .mark{font-family:"Playfair Display",serif;font-size:18px}
-#lobby .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+#lobby .mark{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;letter-spacing:.03em;
+  text-shadow:0 2px 6px rgba(0,0,0,.9);
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lobby body[data-lang="en"] .mark{font-family:"Playfair Display",serif;font-size:16px}
+#lobby .lang{display:flex;flex:none;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
 #lobby .lang button{padding:5px 10px;font-size:11px;letter-spacing:.08em;color:var(--parchment-dim)}
 #lobby .lang button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
 
@@ -398,7 +434,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 *{box-sizing:border-box;margin:0;padding:0}
 #room, #room{height:100%}
 #room{
-  background:var(--ink) url(assets/tablebg.webp) center/cover no-repeat;
+  background:var(--ink) url(assets/tablebg.webp) center -78px/cover no-repeat;
   color:var(--parchment);
   font-family:"Gowun Dodum",system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;overflow:hidden;
@@ -419,7 +455,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .view button{padding:5px 9px;font-size:10.5px;letter-spacing:.06em;color:var(--parchment-dim)}
 #room .view button[aria-pressed="true"]{color:#120C07;background:linear-gradient(180deg,var(--gold-hi),var(--gold))}
 
-#room .roomno{
+#room .roomno{position:relative;z-index:3;
   margin-top:12px;padding:12px 14px;border:1px solid var(--gold-dim);border-radius:3px;
   background:rgba(0,0,0,.3);
   display:flex;align-items:center;justify-content:space-between;gap:12px;
@@ -435,20 +471,20 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 
 #room /* ---------- table ---------- */
-.tablewrap{flex:1;min-height:250px;position:relative;margin:14px 0 12px}
-#room .felt{
+.tablewrap{flex:1;min-height:250px;position:static;margin:10px 0 4px}
+#room .felt{background:none !important;box-shadow:none !important;
   position:absolute;left:14%;right:14%;top:10%;bottom:10%;
   border-radius:50%;
   background:radial-gradient(72% 60% at 50% 34%,#3A6A52,var(--felt-1) 46%,var(--felt-2));
   box-shadow:0 0 0 5px rgba(80,58,22,.72),0 0 0 7px rgba(198,154,60,.34),0 18px 40px rgba(0,0,0,.6);
 }
-#room .felt::after{
+#room .feltX::after{
   content:"";position:absolute;inset:0;border-radius:50%;
   background:repeating-linear-gradient(51deg,rgba(255,255,255,.02) 0 1px,transparent 1px 3px);
 }
-#room .felt__c{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  text-align:center;width:74%;
+#room .felt__c{z-index:2;
+  position:absolute;left:49%;top:32.5%;transform:translate(-50%,-50%);
+  text-align:center;width:min(160px,46%);
 }
 #room .felt__n{font-family:"Gowun Batang",serif;font-weight:700;font-size:19px;color:#D9E6DC}
 #room .felt__s{font-size:11.5px;color:#8FA898;margin-top:6px;line-height:1.6}
@@ -479,7 +515,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .seat--me .seat__av{border-color:#E3C67C;box-shadow:0 0 0 3px rgba(227,198,124,.22),0 3px 10px rgba(0,0,0,.6)}
 
 #room /* ---------- controls ---------- */
-.opt{
+.opt{position:relative;z-index:3;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:11px 13px;border:1px solid #33261A;border-radius:3px;margin-bottom:8px;
   background:rgba(0,0,0,.24);
@@ -501,7 +537,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #room .sw[aria-checked="true"]{background:rgba(176,138,52,.3);border-color:var(--gold)}
 #room .sw[aria-checked="true"]::after{transform:translateX(20px);background:var(--gold-hi)}
 
-#room .btn-primary{
+#room .btn-primary{position:relative;z-index:3;
   width:100%;padding:16px;border-radius:2px;
   background:linear-gradient(180deg,#7A2226,#4A1418);
   border:1px solid var(--gold);
@@ -509,15 +545,17 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   box-shadow:0 1px 0 rgba(227,198,124,.26) inset,0 6px 18px rgba(0,0,0,.5);
 }
 #room .btn-primary:disabled{opacity:.42;box-shadow:none}
-#room .waiting{
+#room .waiting{position:relative;z-index:3;
   width:100%;padding:16px;border:1px solid var(--gold-dim);border-radius:2px;
   text-align:center;font-size:14px;color:var(--parchment-dim);
 }
 #room .dots::after{content:"";animation:dots 1.4s steps(4,end) infinite}
 @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
+#room .lowfade{position:absolute;left:-20px;right:-20px;bottom:-20px;height:62%;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(5,9,6,.8) 22%,rgba(4,7,5,.97) 44%)}
 #room .veil{position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(6,10,7,.5),rgba(6,10,7,.42) 34%,rgba(5,8,6,.88))}
+  background:linear-gradient(180deg,rgba(5,9,6,.86) 0%,rgba(6,10,7,.34) 22%,rgba(6,10,7,.28) 52%,rgba(5,8,6,.88) 72%,rgba(4,7,5,.96) 100%)}
 
 
 #tax{
@@ -754,7 +792,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   background:rgba(10,16,12,.92);border:1px solid var(--gold-dim);color:var(--gold-hi);white-space:nowrap}
 
 #table /* ---------- pile in the middle ---------- */
-.pile{position:absolute;left:49%;top:44%;width:0;height:0;z-index:4;transform-style:preserve-3d}
+.pile{position:absolute;left:49%;top:43%;width:0;height:0;z-index:4;transform-style:preserve-3d}
 #table #seats{position:absolute;inset:0;transform-style:preserve-3d}
 #table .play{position:absolute;left:0;top:0;display:flex;gap:4px;transform-style:preserve-3d;
   transform:translate(-50%,calc(-50% + var(--dy,0px))) rotate(var(--r,0deg)) scale(var(--sc,1))}
@@ -764,7 +802,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 }
 #table .play--old{filter:brightness(.5) saturate(.7)}
 
-#table .pile__hint{position:absolute;left:49%;top:44%;transform:translate(-50%,-50%);backface-visibility:hidden;
+#table .pile__hint{position:absolute;left:49%;top:43%;transform:translate(-50%,-50%);backface-visibility:hidden;
   width:132px;text-align:center;font-size:11.5px;color:#83A08D;line-height:1.65;
   border:1px dashed rgba(198,154,60,.3);border-radius:5px;padding:16px 10px}
 
@@ -791,7 +829,9 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #table .card__art img{width:100%;height:100%;object-fit:cover;display:block}
 
 #table /* ---------- hand ---------- */
-.need{position:relative;z-index:2;text-align:center;font-size:11.5px;color:#A9C0B0;margin:2px 0 5px;min-height:16px}
+.need{position:relative;z-index:5;text-align:center;font-size:11.5px;color:#CDE0D4;
+  margin:2px auto 5px;min-height:16px;max-width:96%;padding:3px 10px;border-radius:10px;
+  background:rgba(6,12,8,.72);backdrop-filter:blur(2px);width:fit-content}
 #table .need b{color:var(--gold-hi);font-weight:400}
 #table .timer{height:3px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:8px}
 #table .timer i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-hi),var(--gold));
@@ -825,10 +865,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   <div class="motes" id="motes"></div>
 </div>
 
-<div class="lang" id="lang">
-  <button data-l="ko" aria-pressed="true">한국어</button>
-  <button data-l="en" aria-pressed="false">EN</button>
-</div>
+<button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
 
 <div class="fan"><div class="fan__in" id="fan"></div></div>
 
@@ -849,11 +886,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 <div class="veil"></div>
 <main class="screen">
   <div class="bar"><button class="navback" data-back="entry" aria-label="뒤로">‹</button>
-    <div class="mark" id="mark"></div>
-    <div class="lang" id="lang">
-      <button data-l="ko" aria-pressed="true">한국어</button>
-      <button data-l="en" aria-pressed="false">EN</button>
-    </div>
+    <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
   </div>
 
   <div class="body">
@@ -902,10 +935,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 <main class="screen">
   <div class="bar">
     <div style="display:flex;align-items:center;gap:6px"><button class="navback" data-back="room" aria-label="뒤로">‹</button><div class="bar__t" id="step"></div></div>
-    <div class="lang" id="lang">
-      <button data-l="ko" aria-pressed="true">한</button>
-      <button data-l="en" aria-pressed="false">EN</button>
-    </div>
+    <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
   </div>
 
   <div class="ring" id="ring">
@@ -928,6 +958,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 <div class="veil"></div>
 <main class="screen">
+  <div class="lowfade"></div>
   <div class="bar">
     <button class="back" data-back="lobby" aria-label="나가기">‹</button>
     <div class="bar__t" id="bt"></div>
@@ -972,10 +1003,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   <div class="bar">
     <div style="display:flex;align-items:center;gap:6px"><button class="navback" data-back="room" aria-label="뒤로">‹</button><div class="bar__t" id="step"></div></div>
     <div style="display:flex;gap:6px">
-      <div class="lang" id="lang">
-        <button data-l="ko" aria-pressed="true">한</button>
-        <button data-l="en" aria-pressed="false">EN</button>
-      </div>
+      <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
     </div>
   </div>
 
@@ -1001,10 +1029,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 <section class="page" id="result">
 
 <main class="screen">
-  <div class="lang" id="lang">
-    <button data-l="ko" aria-pressed="true">한</button>
-    <button data-l="en" aria-pressed="false">EN</button>
-  </div>
+  <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
   <div class="head">
     <div class="head__k" id="kicker"></div>
     <div class="head__t" id="title"></div>
@@ -1026,11 +1051,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
     <div style="display:flex;align-items:center;gap:9px"><button class="bar__x" data-back="lobby" aria-label="나가기">✕</button><button id="endRound" style="font-size:10.5px;letter-spacing:.04em;color:#8FA898;border:1px solid #2E4436;border-radius:2px;padding:4px 8px;background:none;cursor:pointer"></button></div>
     <div class="bar__r" id="round"></div>
     <div style="display:flex;align-items:center;gap:9px">
-      <div class="lang" id="lang">
-        <button data-l="ko" aria-pressed="true">한</button>
-        <button data-l="en" aria-pressed="false">EN</button>
-      </div>
-      <div class="bar__s" id="phase">내 차례</div>
+      <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
     </div>
   </div>
 
@@ -1057,6 +1078,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   transition:opacity .2s ease;z-index:50"></div>
 
 </section>
+<div class="cfg" id="cfg" role="dialog" aria-modal="true"><div class="cfg__v" data-cfgclose></div><div class="cfg__p"><div class="cfg__h"><span id="cfgT"></span><button class="cfg__x" data-cfgclose aria-label="close">×</button></div><div class="cfg__b"><div class="cfg__l" id="cfgLangL"></div><div class="cfg__row"><button data-l="ko">한국어</button><button data-l="en">English</button></div><p class="cfg__n" id="cfgNote"></p></div></div></div>
 </div>
 
 <script>
@@ -1161,17 +1183,17 @@ const T = {
     hNew:"방을 만들면 4자리 번호가 나옵니다. 친구에게 번호를 알려 주세요. 4명부터 8명까지 함께할 수 있습니다.",
     lbJoin:"번호로 들어가기", btJoin:"참가",
     rules:"규칙 보기", shTitle:"규칙",
-    shLead:"손에 든 카드를 <b>먼저 다 털어내면</b> 이깁니다. 핵심은 하나입니다 — <b>숫자가 낮을수록 높은 계급</b>이고, 덱에 든 장수도 그만큼 적습니다.",
+    shLead:"손에 든 카드를 <b>먼저 다 털어내면</b> 이깁니다. 핵심은 하나입니다 — <b>숫자가 낮을수록 높은 계급</b>이고, 해당 숫자와 덱에 들어있는 카드의 장 수가 일치합니다. 예) 1 사자 = 1장, 12 생쥐 = 12장.",
     names:["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"],
     count:function(n){return n + "장"},
     items:[
       ["내는 법","앞사람이 낸 것과 <b>같은 장수</b>로, <b>더 낮은 숫자</b>만 낼 수 있습니다. 8번 세 장 위에는 7번 이하 세 장을 냅니다."],
       ["패스","언제든 넘길 수 있고 다음 차례에 다시 낼 수 있습니다. 전원이 넘기면 바닥을 치우고 마지막에 낸 분이 새로 시작합니다."],
       ["세금","판이 끝나면 등수가 다음 판의 계급이 됩니다. 1등은 꼴등의 가장 좋은 카드 두 장을 가져가고 아무 카드나 두 장을 줍니다. 2등은 뒤에서 두 번째와 한 장씩 바꿉니다."],
-      ["혁명","카멜레온 두 장을 모두 쥐면 그 판의 세금이 취소됩니다. 그분이 꼴등이면 대혁명이 되어 계급이 통째로 뒤집힙니다."],
-      ["점수와 승리","한 판이 끝나면 1등 100점, 2등 90점처럼 등수마다 10점씩 낮게 받습니다. 방장이 정한 판 수를 다 치르고 총점이 가장 높은 분이 우승합니다. 세금과 혁명은 방에서 끌 수 있습니다."]
+      ["혁명","한 사람이 카멜레온 두 장을 모두 쥐면 그 판의 세금이 취소됩니다. 그 사람이 꼴등이면 대혁명이 되어 계급이 통째로 뒤집힙니다."],
+      ["점수와 승리","한 판이 끝나면 1등 100점, 2등 90점처럼 등수마다 점수를 받습니다. 방장이 정한 판 수를 다 치르고 총점이 가장 높은 분이 우승합니다. 세금과 혁명 기능은 방에서 끌 수 있습니다."]
     ],
-    joker:["카멜레온","다른 카드와 같이 내면 그 카드로 변합니다. 5번 두 장에 카멜레온을 얹으면 5번 세 장이 됩니다. 혼자 내면 13번으로 취급되어 가장 약합니다. 덱에 두 장 있습니다."]
+    joker:["카멜레온","다른 카드와 같이 내면 그 카드로 변합니다. 5번 두 장에 카멜레온을 얹으면 5번 세 장이 됩니다. 혼자 내면 13번으로 취급되어 가장 약합니다. 덱에 총 두 장 있습니다."]
   },
   en:{
     mark:"Zoo President",
@@ -1181,17 +1203,17 @@ const T = {
     hNew:"You'll get a 4-digit number. Share it with your friends. 4 to 8 players.",
     lbJoin:"JOIN BY NUMBER", btJoin:"Join",
     rules:"How to play", shTitle:"How to play",
-    shLead:"<b>Empty your hand first</b> to win. One thing drives everything — a <b>lower number means higher rank</b>, and fewer of them exist in the deck.",
+    shLead:"<b>Empty your hand first</b> to win. One idea drives everything — <b>the lower the number, the higher the rank</b>, and that number is also how many of the card sit in the deck. 1 Lion means one card, 12 Mouse means twelve.",
     names:["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"],
     count:function(n){return n + (n === 1 ? " card" : " cards")},
     items:[
-      ["Playing","Match the <b>same count</b> as the player before you, at a <b>lower number</b>. Three 8s can only be beaten by three cards of 7 or lower."],
-      ["Passing","Pass any time and rejoin on your next turn. When everyone passes, the pile clears and whoever played last leads again."],
-      ["Tax","Finishing order sets rank for the next round. First takes the last player's two best cards and hands back any two. Second swaps one card with the second-to-last."],
-      ["Revolution","Hold both chameleons and tax is cancelled for that round. If the last-place player holds them, ranks reverse entirely."],
-      ["Score and winning","Each round pays 100 for first, 90 for second, and ten less per place. After the host's chosen number of rounds, the highest total wins. Tax and revolution can be switched off in the room."]
+      ["Playing","Match the <b>same count</b> as the player before you, at a <b>lower number</b>. Three 8s must be answered with three cards of 7 or lower."],
+      ["Passing","Pass any time and play again on your next turn. Once everyone passes, the pile is cleared and whoever played last leads."],
+      ["Tax","Finishing order sets rank for the next round. First takes the last player's two best cards and hands back any two. Second swaps one card with the second from last."],
+      ["Revolution","If one player holds both chameleons, tax is cancelled for that round. If that player finished last it becomes a great revolution and every rank reverses."],
+      ["Score and winning","Each round pays out by place — 100 for first, 90 for second, and so on down. After the number of rounds the host set, the highest total wins. Tax and revolution can be switched off in the room."]
     ],
-    joker:["Chameleon","Played alongside other cards it becomes that card — two 5s plus a chameleon makes three 5s. Played alone it counts as 13, the weakest card. Two are in the deck."]
+    joker:["Chameleon","Played alongside other cards it becomes that card — two 5s plus a chameleon makes three 5s. Played alone it counts as 13, the weakest card of all. Two are in the deck."]
   }
 };
 let lang = window.__lang || "ko";
@@ -1213,7 +1235,6 @@ function render(){
   document.body.dataset.lang = lang;
   document.documentElement.lang = lang;
   const set = (id, v) => document.getElementById(id).textContent = v;
-  set("mark", t.mark);
   set("lbQuick", t.lbQuick); set("btQuick", t.btQuick); set("hQuick", t.hQuick);
   set("lbNew", t.lbNew); set("btNew", t.btNew); set("hNew", t.hNew);
   set("lbJoin", t.lbJoin); set("btJoin", t.btJoin);
@@ -1544,8 +1565,8 @@ function renderSeats(){
   box.innerHTML = "";
   for (let i = 0; i < cap; i++){
     const a = (Math.PI / 2) + (i * 2 * Math.PI / cap);   // 아래에서 시계 방향
-    const left = 50 + Math.cos(a) * -40;
-    const top  = 50 + Math.sin(a) * 42;
+    const left = 49 + Math.cos(a) * -36;
+    const top  = 32.5 + Math.sin(a) * 12;
     const filled = i < joined;
     const el = document.createElement("div");
     el.className = "seat" + (filled ? "" : " seat--empty") + (i === 0 ? " seat--me" : "");
@@ -2246,7 +2267,7 @@ function cardHTML(n, w){
 }
 
 /* 배경 그림의 초록 타원 (화면 기준 x 17~81%, y 40~65%) 바로 바깥에 앉힌다 */
-const RING = {cx: 49, cy: 44, rx: 36, ry: 16};
+const RING = {cx: 49, cy: 43, rx: 36, ry: 14.5};
 function seatPos(i){
   const a = (Math.PI / 2) + (i * 2 * Math.PI / SEATS.length);
   return {x: RING.cx + Math.cos(a) * -RING.rx, y: RING.cy + Math.sin(a) * RING.ry};
@@ -2554,9 +2575,15 @@ window.addEventListener("langchange", () => { lang = window.__lang; draw(); });
 })();
 
 /* 언어는 앱 전체가 하나로 움직인다 */
-window.__lang = window.__lang || "ko";
+/* 접속 환경에 맞춰 기본 언어를 고르고, 바꾼 값은 기억한다 */
+window.__lang = (function(){
+  try { const v = localStorage.getItem("zk_lang"); if (v === "ko" || v === "en") return v; } catch(e){}
+  const n = (navigator.language || navigator.userLanguage || "ko").toLowerCase();
+  return n.indexOf("ko") === 0 ? "ko" : "en";
+})();
 window.setLang = l => {
   window.__lang = l;
+  try { localStorage.setItem("zk_lang", l); } catch(e){}
   document.documentElement.lang = l;
   document.querySelectorAll("[data-l]").forEach(b =>
     b.setAttribute("aria-pressed", String(b.dataset.l === l)));
@@ -2565,7 +2592,27 @@ window.setLang = l => {
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-l]");
   if (b) window.setLang(b.dataset.l);
+  if (e.target.closest("[data-cfgopen]")) openCfg();
+  if (e.target.closest("[data-cfgclose]")) document.getElementById("cfg").classList.remove("on");
 });
+
+const CFG_T = {
+  ko:{ title:"설정", lang:"언어",
+       note:"처음 들어오면 기기 언어에 맞춰 자동으로 정해집니다. 여기서 바꾸면 그 선택을 기억합니다." },
+  en:{ title:"Settings", lang:"LANGUAGE",
+       note:"The game picks your device language on first visit. Changing it here is remembered." }
+};
+function openCfg(){
+  const t = CFG_T[window.__lang] || CFG_T.ko;
+  document.getElementById("cfgT").textContent = t.title;
+  document.getElementById("cfgLangL").textContent = t.lang;
+  document.getElementById("cfgNote").textContent = t.note;
+  document.getElementById("cfg").classList.add("on");
+}
+window.addEventListener("langchange", () => {
+  if (document.getElementById("cfg").classList.contains("on")) openCfg();
+});
+window.setLang(window.__lang);
 
 function go(id){
   document.querySelectorAll(".page").forEach(p => p.classList.remove("is-on"));
