@@ -36,17 +36,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
   background:linear-gradient(180deg,rgba(6,4,2,.7),rgba(6,4,2,.28) 58%,transparent)}
 .bg__bot{position:absolute;left:0;right:0;bottom:0;height:34%;
   background:linear-gradient(180deg,transparent,rgba(8,5,2,.5) 52%,rgba(6,4,2,.88) 86%,#0B0803)}
-.motes{position:absolute;inset:0;pointer-events:none}
-.mote{position:absolute;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,232,178,.95),rgba(220,170,80,0) 68%)}
-@media (prefers-reduced-motion:no-preference){
-  .mote{animation:rise linear infinite}
-  @keyframes rise{
-    from{transform:translate3d(0,0,0);opacity:0}
-    14%{opacity:.9}86%{opacity:.6}
-    to{transform:translate3d(18px,-92vh,0);opacity:0}}
-}
-
 /* ---------- 화면 ---------- */
 .screen{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top) + 14px) 18px calc(env(safe-area-inset-bottom) + 22px)}
@@ -129,6 +118,74 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   .btn{animation:rise2 .6s ease both;animation-delay:.62s}
   @keyframes rise2{from{opacity:0;transform:translateY(12px)}}
 }
+
+/* ================= 놋쇠 틀 ================= */
+:root{
+  --fr-panel:url(assets/fr_panel.webp); --fr-row:url(assets/fr_row.webp);
+  --fr-btn:url(assets/fr_btn.webp); --fr-btn-down:url(assets/fr_btn_down.webp);
+}
+/* 버튼 */
+#lobby .btn-primary,#lobby .btn-second,
+#room .btn-primary,#room .waiting,
+#draw .bt-main,#tax .bt-main,#tax .bt-ghost,
+#table .acts button,#result .bt-main,#result .bt-ghost,
+#opts .opts__go,#cfg .cfg__row button{
+  border:13px solid transparent !important;
+  border-image:var(--fr-btn) 33 fill stretch !important;
+  border-image-width:13px !important;
+  background:none !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  padding:6px 10px !important;
+  min-height:52px;
+  color:#E9D5AC !important;
+  text-shadow:0 1px 3px rgba(0,0,0,.85);
+}
+#lobby .btn-primary:active,#lobby .btn-second:active,
+#room .btn-primary:active,#draw .bt-main:active,#tax .bt-main:active,
+#tax .bt-ghost:active,#table .acts button:active,#result .bt-main:active,
+#result .bt-ghost:active,#opts .opts__go:active{
+  border-image:var(--fr-btn-down) 33 fill stretch !important;
+  transform:translateY(1px);
+}
+/* 강조 버튼은 글씨를 더 밝게 */
+#lobby .btn-primary,#room .btn-primary,
+#draw .bt-main,#tax .bt-main,#result .bt-main,#opts .opts__go,
+#table #play{
+  color:#FBEFCE !important;
+  text-shadow:0 0 10px rgba(240,209,140,.34),0 1px 3px rgba(0,0,0,.9);
+}
+button:disabled{opacity:.42}
+
+/* 한 줄 틀 */
+#opts .mk__row,#room .roomno,#room .sum,#result .row,#cfg .cfg__row{
+  border:12px solid transparent !important;
+  border-image:var(--fr-row) 33 stretch !important;
+  border-image-width:12px !important;
+  background:rgba(6,10,7,.5) !important;
+  background-clip:padding-box !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+#opts .mk__row{margin-bottom:2px !important;padding:2px 4px !important}
+#result .row{padding:2px 6px !important;gap:8px !important}
+#room .roomno{padding:2px 6px !important}
+#room .sum{padding:4px 8px !important}
+
+/* 큰 패널 */
+#opts .opts__p,#cfg .cfg__p,#lobby .sheet__panel{
+  border:26px solid transparent !important;
+  border-image:var(--fr-panel) 105 stretch !important;
+  border-image-width:26px !important;
+  background:linear-gradient(180deg,rgba(20,14,9,.97),rgba(10,7,4,.99)) !important;
+  background-clip:padding-box !important;
+  border-radius:0 !important;
+  margin:0 8px 8px !important;
+  padding:4px 6px !important;
+}
+#opts .opts__h,#cfg .cfg__h,#lobby .sheet__head{border-bottom:none !important;padding:6px 6px 8px !important}
+#opts .opts__b,#cfg .cfg__b{padding:2px 4px !important}
+#opts .opts__f{padding:8px 4px 4px !important}
 
 /* ---------- 폰 비율 틀 ---------- */
 #stage{position:fixed;inset:0;overflow:hidden;background:#0A0705}
@@ -452,6 +509,9 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 #draw .mid__h{font-family:"Gowun Batang",serif;font-weight:700;font-size:17px;margin-bottom:6px}
 #draw .mid__s{font-size:12.5px;color:#A9C0B0;line-height:1.7}
 #draw .mid__s b{color:var(--gold-hi);font-weight:400}
+#draw .cd{font-family:"Noto Serif KR",serif;font-weight:900;font-size:44px;color:#F0D18C;
+  margin-top:10px;line-height:1;text-shadow:0 3px 14px rgba(0,0,0,.8);animation:cdPop .35s ease}
+@keyframes cdPop{from{opacity:0;transform:scale(.7)}}
 
 #draw .acts{display:flex;gap:9px;margin-top:10px}
 #draw .acts button{flex:1;padding:15px;border-radius:2px;
@@ -622,7 +682,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 
 #tax /* ring */
 .ring{flex:1;min-height:0;position:static;margin-top:6px}
-#tax .plane{position:absolute;left:0;right:0;top:15%;bottom:11%}
+#tax .plane{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none}
 #tax .felt{display:none}
 #tax .fx{position:absolute;inset:0;pointer-events:none;z-index:9}
 #tax .fly{position:absolute;transition:left .5s cubic-bezier(.25,.8,.3,1),top .5s cubic-bezier(.25,.8,.3,1),transform .5s cubic-bezier(.25,.8,.3,1),opacity .3s ease}
@@ -900,7 +960,6 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   <div class="bg__img"></div>
   <div class="bg__top"></div>
   <div class="bg__bot"></div>
-  <div class="motes" id="motes"></div>
 </div>
 
 <button class="cfgbtn" data-cfgopen aria-label="settings"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3.5 7h9M17 7h3.5M3.5 12h4M12 12h8.5M3.5 17h8M15.5 17h5"/><circle cx="14.6" cy="7" r="2.1"/><circle cx="9.6" cy="12" r="2.1"/><circle cx="13.2" cy="17" r="2.1"/></svg></button>
@@ -1168,19 +1227,6 @@ function apply(){
 }
 apply();
 
-const motes = document.getElementById("motes");
-for (let i = 0; i < 22; i++){
-  const s = document.createElement("span");
-  s.className = "mote";
-  const size = 2 + Math.random() * 4;
-  s.style.cssText =
-    "left:" + (Math.random() * 100).toFixed(1) + "%;top:" + (76 + Math.random() * 30).toFixed(1) + "%;" +
-    "width:" + size.toFixed(1) + "px;height:" + size.toFixed(1) + "px;" +
-    "animation-duration:" + (13 + Math.random() * 14).toFixed(1) + "s;" +
-    "animation-delay:-" + (Math.random() * 24).toFixed(1) + "s";
-  motes.appendChild(s);
-}
-
 document.querySelectorAll("#lang button").forEach(b => {
   b.addEventListener("click", () => {
     lang = b.dataset.l;
@@ -1356,7 +1402,7 @@ const T = {
        doneH:"순서가 정해졌습니다", first:"선",
        doneS:n=>'<b>'+n+'</b>님이 먼저 시작합니다. 차례는 여기서 시계 방향입니다.',
        note:"첫 판은 계급도 세금도 없습니다.",
-       go:"판 시작", picking:"고르는 중" },
+       goIn:n=>n+"초 뒤 시작합니다", picking:"고르는 중" },
   en:{ step:"Opening draw",
        h:"Draw one card",
        s:"The lowest number leads. Turn order runs clockwise from that seat. A chameleon counts as 13.",
@@ -1365,7 +1411,7 @@ const T = {
        doneH:"Turn order is set", first:"LEAD",
        doneS:n=>'<b>'+n+'</b> leads. Turns run clockwise from there.',
        note:"The first round has no ranks and no tax.",
-       go:"Start round", picking:"Choosing" }
+       goIn:n=>"Starting in "+n, picking:"Choosing" }
 };
 let lang = window.__lang || "ko";
 let N = 6;
@@ -1482,6 +1528,19 @@ function botPick(){
   pick(seat, free[Math.floor(Math.random() * free.length)]);
 }
 
+let cd = 5, cdId = null;
+function startCountdown(){
+  cd = 5; draw();
+  if (cdId) clearInterval(cdId);
+  cdId = setInterval(() => {
+    cd--;
+    draw();
+    if (cd <= 0){
+      clearInterval(cdId); cdId = null;
+      const g = el("go"); if (g && !g.disabled) g.click();
+    }
+  }, 1000);
+}
 function settle(){
   phase = "done";
   const w = winner();
@@ -1493,6 +1552,7 @@ function settle(){
   window.GAME.finish = null;
   window.GAME.hold = null;
   draw();
+  startCountdown();
 }
 
 
@@ -1550,7 +1610,8 @@ function draw(){
   const m = el("mid");
   if (phase === "done"){
     m.innerHTML = '<div class="mid__h">' + t.doneH + '</div><div class="mid__s">' +
-      t.doneS(nameOf(winner())) + '<br>' + t.note + '</div>';
+      t.doneS(nameOf(winner())) + '<br>' + t.note + '</div>' +
+      '<div class="cd">' + Math.max(cd, 0) + '</div>';
   } else if (!waiting.length){
     m.innerHTML = '<div class="mid__h">' + t.waitH + '</div><div class="mid__s">' + t.settling + '</div>';
   } else if (waiting[0] === 0){
@@ -1560,7 +1621,7 @@ function draw(){
       t.waitS(nameOf(waiting[0])) + '</div>';
   }
   const g = el("go");
-  g.textContent = phase === "done" ? t.go : t.picking;
+  g.textContent = phase === "done" ? t.goIn(cd) : t.picking;
   g.disabled = phase !== "done";
   const md = el("mid");
   anchorSeats(el("seats"), md ? md.getBoundingClientRect().top - 4 : 0);
@@ -1568,6 +1629,8 @@ function draw(){
 
 function boot(){
   N = (window.__opts && window.__opts.cap) || 6;
+  if (cdId){ clearInterval(cdId); cdId = null; }
+  cd = 5;
   drawn = Array(N).fill(null);
   pickOrder = [];
   window.__roundNo = 1;
@@ -2318,7 +2381,7 @@ const T = {
        pass:"패스", pick:"카드를 고르세요", play:n=>n+"장 내기",
        notTurn:"상대 차례입니다", mix:"같은 숫자만 함께 낼 수 있습니다",
        cnt:n=>n+"장을 맞춰 주세요", lower:"더 낮은 숫자를 내세요",
-       autoPass:"시간 초과 · 자동 패스", cleared:"판을 비웠습니다 · 다시 선", endR:"판 종료",
+       autoPass:"시간이 다 되어 자동으로 넘겼습니다", left2:n=>n+"초", cleared:"판을 비웠습니다 · 다시 선", endR:"판 종료",
        close:"다시 누르면 접힙니다" },
 
   en:{ roundN:n=>"Round "+n, joker:"CHAMELEON",
@@ -2330,7 +2393,7 @@ const T = {
        pass:"Pass", pick:"Select cards", play:n=>"Play "+n,
        notTurn:"Opponent's turn", mix:"Cards must share one number",
        cnt:n=>"Play exactly "+n, lower:"Play a lower number",
-       autoPass:"Time up · passed", cleared:"Pile cleared \u00B7 you lead again", endR:"End round",
+       autoPass:"Time up \u2014 passed for you", left2:n=>n+"s", cleared:"Pile cleared \u00B7 you lead again", endR:"End round",
        close:"Tap again to close" }
 };
 let lang = window.__lang || "ko";
@@ -2603,10 +2666,14 @@ function renderHand(){
 function renderBottom(){
   const c = cur();
   const t = T[lang];
+  const mine = turn === 0 && !busy;
   const who = turn === 0 ? "" : t.theirTurn((lang === "ko" ? ALL : ALL_EN)[turn]) + " \u00B7 ";
+  const left = mine && tLeft > 0
+    ? ' \u00B7 <span class="count' + (tLeft <= 5 ? " warn" : "") + '">' + t.left2(tLeft) + '</span>'
+    : "";
   el("need").innerHTML = who + (c
     ? (c.num === 1 ? t.top1 : t.need(c.count, c.num - 1))
-    : (turn === 0 ? t.lead : ""));
+    : (turn === 0 ? t.lead : "")) + left;
 
   const rn = window.__roundNo || 1;
   const NM = lang === "ko" ? KO_N : EN_N;
@@ -2635,11 +2702,24 @@ function draw(){
   anchorSeats(el("seats"), nd ? nd.getBoundingClientRect().top - 4 : 0);
 }
 
-let timerId = null;
+let timerId = null, tickId = null, tLeft = 0;
+const TURN_SEC = 20;
 function resetTimer(){
   el("timer").innerHTML = "<i></i>";
+  el("timer").classList.toggle("mine", turn === 0 && !busy);
   if (timerId) clearTimeout(timerId);
-  if (turn === 0 && !busy) timerId = setTimeout(() => { if (turn === 0 && !busy) doPass(true); }, 15000);
+  if (tickId) clearInterval(tickId);
+  tLeft = 0;
+  if (turn === 0 && !busy){
+    tLeft = TURN_SEC;
+    renderBottom();
+    tickId = setInterval(() => {
+      tLeft--;
+      if (tLeft <= 0){ clearInterval(tickId); tickId = null; }
+      renderBottom();
+    }, 1000);
+    timerId = setTimeout(() => { if (turn === 0 && !busy) doPass(true); }, TURN_SEC * 1000);
+  }
 }
 
 function clearTrick(){
@@ -2760,14 +2840,14 @@ function doPass(auto){
   if (turn !== 0 || busy) return;
   if (timerId) clearTimeout(timerId);
   sel = []; SEATS[0].s = "pass"; busy = true;
-  if (auto) flash(T[lang].autoPass);
+  if (auto) flash(T[lang].autoPass, true);
   draw(); setTimeout(advance, 500);
 }
 el("pass").onclick = () => doPass(false);
 
-function flash(msg){
+function flash(msg, msLong){
   const f = el("flash"); f.textContent = msg; f.style.opacity = 1;
-  setTimeout(() => f.style.opacity = 0, 1200);
+  setTimeout(() => f.style.opacity = 0, msLong ? 2200 : 1200);
 }
 
 el("ring").addEventListener("click", e => {
