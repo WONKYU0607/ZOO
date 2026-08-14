@@ -1656,7 +1656,7 @@ function draw(){
 }
 
 function boot(){
-  N = (window.__opts && window.__opts.cap) || 6;
+  N = (window.__opts && (window.__opts.seated || window.__opts.cap)) || 6;
   if (cdId){ clearInterval(cdId); cdId = null; }
   cd = 5;
   drawn = Array(N).fill(null);
@@ -1862,6 +1862,11 @@ draw();
 window.addEventListener("resize", draw);
 window.addEventListener("optschange", draw);
 
+/* 시작을 누르는 순간의 실제 인원을 확정한다 (자리를 다 안 채우고 시작할 수 있음) */
+document.getElementById("action").addEventListener("click", e => {
+  if (e.target.closest(".btn-primary") && window.__opts) window.__opts.seated = joined;
+});
+
 document.querySelectorAll("#lang button").forEach(b => {
   b.addEventListener("click", () => {
     lang = b.dataset.l;
@@ -1914,6 +1919,7 @@ const T = {
     revH:"혁명", revNone:"카멜레온 두 장을 모두 쥔 사람이 없습니다.",
     revMine:"카멜레온 두 장이 모두 손에 들어왔습니다. 혁명을 선언하면 이번 판 세금이 사라집니다.",
     revOther:n=>n+"님이 카멜레온 두 장을 쥐고 혁명을 선언했습니다. 이번 판 세금은 없습니다.",
+    revGreatOther:n=>n+"님이 꼴등으로 대혁명을 선언했습니다. 세금이 사라지고 등수가 통째로 뒤집힙니다.",
     revGreatMine:"꼴등인데 카멜레온 두 장을 모두 쥐었습니다. 대혁명을 선언하면 세금이 사라지고 계급이 통째로 뒤집힙니다.",
     revGreatDone:"대혁명. 계급이 뒤집혔습니다.", revDone:"혁명. 이번 판 세금은 없습니다.",
     taxH:"세금", taxSkip:"혁명으로 이번 판 세금은 걷지 않습니다.",
@@ -1936,6 +1942,7 @@ const T = {
     revH:"Revolution", revNone:"Nobody holds both chameleons.",
     revMine:"Both chameleons are in your hand. Declare a revolution and this round's tax is cancelled.",
     revOther:n=>n+" holds both chameleons and declared a revolution. No tax this round.",
+    revGreatOther:n=>n+" declared a great revolution from last place. Tax is cancelled and every standing reverses.",
     revGreatMine:"You are last and hold both chameleons. A great revolution cancels tax and reverses every rank.",
     revGreatDone:"Great revolution. Every rank is reversed.", revDone:"Revolution. No tax this round.",
     taxH:"Tax", taxSkip:"The revolution cancels tax for this round.",
@@ -1954,6 +1961,7 @@ const T = {
 };
 let lang = "ko", step = 0, sel = [], declared = false, reversed = false, revSeat = null;
 let ranks = [];
+let wasGreat = false;   /* 선언 시점의 대혁명 여부 (뒤집은 뒤엔 다시 계산하면 틀린다) */
 const G = () => (window.GAME = window.GAME || {});
 const holds = () => G().hold || [];
 const myHand = () => holds()[0] || [];
@@ -2180,9 +2188,9 @@ function renderMid(){
     const great = revSeat !== null && rankOf(revSeat) === n - 1;
     html = '<div class="mid__h">' + t.revH + '</div><div class="mid__s">' +
       (revSeat === null ? t.revNone
-       : declared ? (great ? t.revGreatDone : t.revDone)
+       : declared ? (wasGreat ? t.revGreatDone : t.revDone)
        : revSeat === 0 ? (great ? t.revGreatMine : t.revMine)
-       : t.revOther(nameOf(revSeat))) + '</div>';
+       : (great ? t.revGreatOther(nameOf(revSeat)) : t.revOther(nameOf(revSeat)))) + '</div>';
     if (revSeat === 0 && !declared)
       html += '<div class="flow rev"><div class="frow"><span class="frow__c">' +
         cardHTML(13, 40) + cardHTML(14, 40) + '</span></div></div>';
@@ -2248,7 +2256,7 @@ function boot(){
   N = g.N || 6;
   ranks = (g.finish && g.finish.length === N) ? g.finish.slice()
         : Array.from({length: N}, (_, i) => i);
-  step = 0; sel = []; declared = false; reversed = false; revSeat = null;
+  step = 0; sel = []; declared = false; reversed = false; revSeat = null; wasGreat = false;
   clearFx();
   draw();
 }
@@ -2259,6 +2267,7 @@ el("next").onclick = () => {
   const great = revSeat !== null && rankOf(revSeat) === N - 1;
   if (step === 2 && revSeat !== null && !declared){
     declared = true;
+    wasGreat = great;
     if (great){
       reversed = true;
       el("flash").classList.remove("go"); void el("flash").offsetWidth; el("flash").classList.add("go");
@@ -2457,7 +2466,7 @@ let finish = [];                 // 이번 판에 손을 턴 순서 (자리 번�
 
 function boot(fresh){
   const G = window.GAME;
-  const n = (G && G.N) || (window.__opts && window.__opts.cap) || 6;
+  const n = (G && G.N) || (window.__opts && (window.__opts.seated || window.__opts.cap)) || 6;
   if (fresh !== false || !G || !G.hold){
     SEATS = ALL.slice(0, n).map(x => ({n: x, c: 0, s: ""}));
     dealAll();
@@ -2467,12 +2476,15 @@ function boot(fresh){
   }
   hand = SEATS[0].hold;
   finish = [];
+  myGen++;                                /* 이전 판의 예약된 봇 호출을 모두 무효화 */
+  if (timerId) clearTimeout(timerId);
+  if (tickId) clearInterval(tickId);
   sel = []; trick = []; busy = false; animated = 0; spread = false;
   lastPlayer = null;
   turn = (G && G.order && G.order.length) ? G.order[0] : 0;
   syncGame();
   draw(); resetTimer();
-  if (turn !== 0) setTimeout(botTurn, 900);
+  if (turn !== 0) laterBot(900);
 }
 function syncGame(){
   window.GAME = window.GAME || {};
@@ -2731,7 +2743,12 @@ function draw(){
 }
 
 let timerId = null, tickId = null, tLeft = 0;
-const TURN_SEC = 20;
+let myGen = 0, botGen = 0;               /* 판이 바뀌면 세대를 올려 이전 예약을 무효화 */
+function laterBot(ms){
+  const g = myGen;
+  setTimeout(() => { botGen = g; if (g === myGen) botTurn(); }, ms);
+}
+const TURN_SEC = 15;
 function resetTimer(){
   el("timer").innerHTML = "<i></i>";
   el("timer").classList.toggle("mine", turn === 0 && !busy);
@@ -2761,7 +2778,7 @@ function clearTrick(){
     if (++guard > SEATS.length){ endRound(); return; }
   }
   busy = false; draw(); resetTimer();
-  if (turn !== 0) setTimeout(botTurn, 900);
+  if (turn !== 0) laterBot(900);
 }
 
 /* 카드를 다 턴 사람을 완주 목록에 올린다 */
@@ -2797,7 +2814,7 @@ function advance(){
     if (++guard > SEATS.length * 2){ endRound(); return; }   // 돌 사람이 없으면 종료
   } while (SEATS[turn].c === 0 || SEATS[turn].s === "pass");
   busy = false; draw(); resetTimer();
-  if (turn !== 0) setTimeout(botTurn, 950);
+  if (turn !== 0) laterBot(950);
 }
 
 /* 손패에서 낼 수 있는 조합 중 가장 약한(숫자 큰) 것 */
@@ -2824,6 +2841,10 @@ function takeFrom(hold, num, count){
   return out.sort((a, b) => a - b);
 }
 function botTurn(){
+  /* 내 자리에서는 절대 자동으로 내지 않는다.
+     판이 다시 시작되면 이전 판에서 예약된 호출이 남아 내 카드를 내던 버그가 있었다 */
+  if (turn === 0) { busy = false; draw(); resetTimer(); return; }
+  if (botGen !== myGen) return;          /* 지난 판에서 예약된 것 */
   busy = true;
   const s = SEATS[turn], c = cur();
   const pick = botPick(s.hold, c);
@@ -2835,7 +2856,7 @@ function botTurn(){
       draw(); flash(T[lang].cleared);
       setTimeout(() => { trick = []; spread = false; animated = 0;
         SEATS.forEach(x => x.s = ""); busy = false; draw(); resetTimer();
-        if (turn !== 0) setTimeout(botTurn, 800); }, 900);
+        if (turn !== 0) laterBot(800); }, 900);
       return;
     }
   } else s.s = "pass";
@@ -2926,11 +2947,13 @@ window.__opts = window.__opts || {cap: 6, rounds: 5, tax: true, clear2: false};
 let optMode = "create";
 const OPT_T = {
   ko:{ create:"방 만들기", edit:"방 설정", goCreate:"방 만들기", goEdit:"확인",
+       quick:"빠른 참가", goQuick:"참가하기", join:"번호로 들어가기", goJoin:"들어가기",
        cap:["방 인원","4명 – 8명"],
        rnd:["플레이 판 수 설정","최소 3판부터 시작"],
        tax:["세금과 혁명","등수에 따라 카드를 교환하고, 조커 두 장으로 순위를 뒤집는 규칙입니다."],
        cut:["2번 컷","2번 카드를 내면 바닥을 비우고 다시 선을 잡습니다."], unit:"판" },
   en:{ create:"Create a room", edit:"Room settings", goCreate:"Create room", goEdit:"Done",
+       quick:"Quick match", goQuick:"Join", join:"Join by number", goJoin:"Join",
        cap:["Table size","4 – 8 players"],
        rnd:["Number of rounds","Three at least"],
        tax:["Tax and revolution","Cards change hands by standing, and two jokers overturn it."],
@@ -2951,8 +2974,11 @@ function optSw(k, on){
 }
 function optRender(){
   const t = OPT_T[window.__lang] || OPT_T.ko, o = window.__opts;
-  document.getElementById("optT").textContent = optMode === "create" ? t.create : t.edit;
-  document.getElementById("optGo").textContent = optMode === "create" ? t.goCreate : t.goEdit;
+  const TT = {create:[t.create,t.goCreate], quick:[t.quick,t.goQuick],
+              join:[t.join,t.goJoin], edit:[t.edit,t.goEdit]};
+  const pair = TT[optMode] || TT.edit;
+  document.getElementById("optT").textContent = pair[0];
+  document.getElementById("optGo").textContent = pair[1];
   document.getElementById("optBody").innerHTML =
     optRow(t.cap, optStep("cap", o.cap, 4, 8)) +
     optRow(t.rnd, optStep("rnd", o.rounds, 3, 99, t.unit)) +
@@ -2980,8 +3006,8 @@ document.addEventListener("click", e => {
 });
 document.getElementById("optGo").addEventListener("click", () => {
   document.getElementById("opts").classList.remove("on");
-  if (optMode === "create") setTimeout(() => go("room"), 80);
-  else window.dispatchEvent(new Event("optschange"));
+  if (optMode === "edit") window.dispatchEvent(new Event("optschange"));
+  else setTimeout(() => go("room"), 80);
 });
 window.addEventListener("langchange", () => {
   if (document.getElementById("opts").classList.contains("on")) optRender();
@@ -3023,10 +3049,9 @@ function go(id){
 document.querySelector("#entry #start").addEventListener("click", () => go("lobby"));
 
 /* 로비 → 대기실 */
-["#lobby #btQuick", "#lobby #btJoin"].forEach(sel => {
-  const b = document.querySelector(sel);
-  if (b) b.addEventListener("click", () => go("room"));
-});
+/* 빠른 참가·번호 참가도 방 조건을 먼저 정한다 */
+document.querySelector("#lobby #btQuick").addEventListener("click", () => openOpts("quick"));
+document.querySelector("#lobby #btJoin").addEventListener("click", () => openOpts("join"));
 /* 방 만들기는 설정을 먼저 받는다 */
 document.querySelector("#lobby #btNew").addEventListener("click", () => openOpts("create"));
 /* 대기실 시작 → 세금·혁명 */
