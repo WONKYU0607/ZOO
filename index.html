@@ -159,7 +159,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 button:disabled{opacity:.42}
 
 /* 붉은 버튼 — 전용 판 이미지 */
-#entry #start,#table #play,#lobby #btQuick{
+#entry #start,#table #play,#lobby #btQuick,#room #action .btn-primary{
   border:13px solid transparent !important;
   border-image:var(--fr-red) 46 fill stretch !important;
   border-image-width:13px !important;
@@ -171,7 +171,7 @@ button:disabled{opacity:.42}
   color:#FBEFCE !important;
   text-shadow:0 1px 4px rgba(0,0,0,.9);
 }
-#entry #start:active,#table #play:active,#lobby #btQuick:active{
+#entry #start:active,#table #play:active,#lobby #btQuick:active,#room #action .btn-primary:active{
   border-image:var(--fr-red-down) 46 fill stretch !important;
   transform:translateY(1px);
 }
@@ -1604,6 +1604,7 @@ function renderSeats(){
   const box = el("seats"); box.innerHTML = "";
   const order = phase === "done" ? ranking().map(x => x.i) : [];
   for (let i = 0; i < N; i++){
+    const a = (Math.PI / 2) + (i * 2 * Math.PI / N);
     const p = seatPos(i);
     const d = document.createElement("div");
     const r = order.indexOf(i);
@@ -1616,11 +1617,14 @@ function renderSeats(){
     d.style.setProperty("--fs", (big ? 10.5 : 9) + "px");
     const first = phase === "done" && i === winner();
     const dv = drawn[i] == null ? "" : val(drawn[i]);
+    const chip = dv === "" ? "" : '<span class="seat__d">' + dv + '</span>';
+    const upper = Math.sin((Math.PI / 2) + (i * 2 * Math.PI / N)) < 0;  /* 위쪽 자리 */
     d.innerHTML =
       '<span class="seat__r' + (first ? " on" : "") + '">' + T[lang].first + '</span>' +
+      (upper ? chip : "") +
       '<img class="seat__av" src="' + HEADS[i] + '" alt="">' +
       '<span class="seat__n">' + nameOf(i) + '</span>' +
-      (dv === "" ? "" : '<span class="seat__d">' + dv + '</span>');
+      (upper ? "" : chip);
     box.appendChild(d);
   }
   const md = el("mid");
@@ -1853,7 +1857,6 @@ function renderControls(){
 function draw(){ syncOpts(); renderSeats(); renderControls();
   const sm2 = document.getElementById("sum");
   anchorSeats(document.getElementById("seats"), sm2 ? sm2.getBoundingClientRect().top - 6 : 0);
-  window.__opts = {rounds: rounds, tax: taxOn, clear2: clear2, cap: cap};
 }
 draw();
 window.addEventListener("resize", draw);
