@@ -123,6 +123,7 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
 :root{
   --fr-panel:url(assets/fr_panel.webp); --fr-row:url(assets/fr_row.webp);
   --fr-btn:url(assets/fr_btn.webp); --fr-btn-down:url(assets/fr_btn_down.webp);
+  --fr-red:url(assets/fr_btn_red.webp); --fr-red-down:url(assets/fr_btn_red_down.webp);
 }
 /* 버튼 */
 #lobby .btn-primary,#lobby .btn-second,
@@ -156,6 +157,24 @@ body[data-lang="en"] .btn{font-family:"Playfair Display",serif}
   text-shadow:0 0 10px rgba(240,209,140,.34),0 1px 3px rgba(0,0,0,.9);
 }
 button:disabled{opacity:.42}
+
+/* 붉은 버튼 — 전용 판 이미지 */
+#entry #start,#table #play,#lobby #btQuick{
+  border:13px solid transparent !important;
+  border-image:var(--fr-red) 46 fill stretch !important;
+  border-image-width:13px !important;
+  background:none !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+  padding:6px 10px !important;
+  min-height:52px;
+  color:#FBEFCE !important;
+  text-shadow:0 1px 4px rgba(0,0,0,.9);
+}
+#entry #start:active,#table #play:active,#lobby #btQuick:active{
+  border-image:var(--fr-red-down) 46 fill stretch !important;
+  transform:translateY(1px);
+}
 
 /* 한 줄 틀 */
 #opts .mk__row,#room .roomno,#room .sum,#result .row,#cfg .cfg__row{
@@ -836,7 +855,9 @@ button:disabled{opacity:.42}
 
 #table .bar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:0 4px}
 #table .bar__x{font-size:19px;line-height:1;color:#8FA898;padding:2px 6px}
-#table .bar__r{font-family:"Gowun Batang",serif;font-weight:700;font-size:13.5px;color:#CFE0D4}
+#table .bar__r{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;
+  font-family:"Noto Serif KR",serif;font-weight:700;font-size:13px;letter-spacing:.1em;
+  color:#DCEAE0;text-shadow:0 1px 4px rgba(0,0,0,.9)}
 #table .bar__s{font-size:11.5px;color:#8FA898}
 #table .lang{display:flex;border:1px solid var(--gold-dim);border-radius:2px;overflow:hidden}
 #table .lang button{padding:3px 7px;font-size:10px;letter-spacing:.06em;color:var(--parchment-dim)}
@@ -1394,7 +1415,7 @@ const NAMES_KO = ["나","민지","준호","서연","태윤","하은","지훈","�
 const NAMES_EN = ["You","Minji","Junho","Seoyeon","Taeyun","Haeun","Jihoon","Yerin"];
 
 const T = {
-  ko:{ step:"첫 계급 정하기",
+  ko:{ step:"첫 순서 정하기",
        h:"카드를 한 장 뽑으세요",
        s:"숫자가 가장 낮은 분이 먼저 시작합니다. 차례는 거기서 시계 방향으로 돕니다. 카멜레온은 13으로 칩니다.",
        waitH:"뽑는 중",
@@ -1533,6 +1554,9 @@ function startCountdown(){
   cd = 5; draw();
   if (cdId) clearInterval(cdId);
   cdId = setInterval(() => {
+    /* 이미 이 화면을 떠났으면 멈춘다 (안 그러면 테이블을 다시 시작시킨다) */
+    const sec = window.document.getElementById("draw");
+    if (sec && !sec.classList.contains("is-on")){ clearInterval(cdId); cdId = null; return; }
     cd--;
     draw();
     if (cd <= 0){
@@ -1651,6 +1675,7 @@ document.querySelectorAll("#lang button").forEach(b => {
     draw();
   });
 });
+el("go").addEventListener("click", () => { if (cdId){ clearInterval(cdId); cdId = null; } });
 window.addEventListener("resize", draw);
 
 window.addEventListener("langchange", () => { lang = window.__lang; draw(); });
@@ -2372,7 +2397,7 @@ const HEADS = ["assets/head_01.webp", "assets/head_02.webp", "assets/head_04.web
 const KO_N = ["사자","호랑이","불곰","코끼리","악어","여우","기린","멧돼지","원숭이","토끼","새","생쥐"];
 const EN_N = ["LION","TIGER","BEAR","ELEPHANT","CROCODILE","FOX","GIRAFFE","BOAR","MONKEY","RABBIT","BIRD","MOUSE"];
 const T = {
-  ko:{ roundN:n=>n+"판째", joker:"카멜레온",
+  ko:{ roundN:n=>"ROUND "+n, joker:"카멜레온",
        myTurn:"내 차례", theirTurn:n=>n+" 차례",
        left:c=>'남은 <b>'+c+'</b>장', tagTurn:"차례", tagPass:"패스", tagOut:"완주",
        lead:"원하는 장수로 시작하세요", top1:'<b>1번</b>이 나왔습니다. 아무도 받을 수 없습니다',
@@ -2384,7 +2409,7 @@ const T = {
        autoPass:"시간이 다 되어 자동으로 넘겼습니다", left2:n=>n+"초", cleared:"판을 비웠습니다 · 다시 선", endR:"판 종료",
        close:"다시 누르면 접힙니다" },
 
-  en:{ roundN:n=>"Round "+n, joker:"CHAMELEON",
+  en:{ roundN:n=>"ROUND "+n, joker:"CHAMELEON",
        myTurn:"Your turn", theirTurn:n=>n+"'s turn",
        left:c=>'<b>'+c+'</b> left', tagTurn:"turn", tagPass:"passed", tagOut:"done",
        lead:"Lead with any number of cards", top1:'<b>1</b> is out. Nobody can beat it',
